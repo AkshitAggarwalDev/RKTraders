@@ -7,6 +7,7 @@ import RKTraders.web.Repositories.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,11 @@ public class ProductService {
 
 
         public List<Product> addProducts(List<Product> products) {
+            for (Product product : products) {
+                product.setCreatedAt(LocalDateTime.now());
+                product.setUpdatedAt(LocalDateTime.now());
+            }
+
             return productRepo.saveAll(products);
         }
 
