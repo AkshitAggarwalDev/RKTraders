@@ -4,6 +4,8 @@ import RKTraders.web.DTO.OwnerLoginDTO;
 import RKTraders.web.DTO.PasswordUpdateDTO;
 import RKTraders.web.Model.Owner;
 import RKTraders.web.Service.OwnerService;
+import RKTraders.web.Service.ProductService;
+import RKTraders.web.enums.ProductStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -62,4 +64,5 @@ public class CompanySettings {
         );
     }
 
-}
+
+    }

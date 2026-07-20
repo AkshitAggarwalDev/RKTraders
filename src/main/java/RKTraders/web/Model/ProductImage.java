@@ -18,7 +18,10 @@ public class ProductImage {
 
     private String imageUrl;
 
+    private boolean primaryImage;
+
     @ManyToOne
+    @JoinColumn(name = "product_id")
     private Product product;
 
 }

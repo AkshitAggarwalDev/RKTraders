@@ -62,6 +62,33 @@ public class SecurityConfig {
 
                         .requestMatchers("/category/**").permitAll()
 
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/cart/**")
+                        .hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/orders/all")
+                        .hasAnyRole("OWNER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/orders/count")
+                        .hasAnyRole("OWNER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/orders/my/count")
+                        .hasRole("CUSTOMER")
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/orders/recent",
+                                "/orders/today"
+                        )
+                        .hasAnyRole("OWNER", "ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/orders/between-dates")
+                        .hasAnyRole("OWNER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET,
+                                "/orders/revenue",
+                                "/orders/count",
+                                "/orders/recent",
+                                "/orders/today")
+                        .hasAnyRole("OWNER", "ADMIN")
+
+
+
                         .anyRequest()
                         .authenticated()
                 )

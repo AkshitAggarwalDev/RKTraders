@@ -5,6 +5,7 @@ import RKTraders.web.Model.Product;
 import RKTraders.web.Repositories.CategoryRepo;
 import RKTraders.web.Repositories.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -96,4 +97,78 @@ public class ProductService {
             return "Product Deleted Successfully";
 
         }
+
+    public List<Product> searchProducts(String name) {
+
+        List<Product> products = productRepo.findByNameContainingIgnoreCase(name);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No Product Found");
+        }
+
+        return products;
+    }
+
+    public List<Product> getProductsByBrand(String brand) {
+
+        List<Product> products = productRepo.findByBrandIgnoreCase(brand);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No Products Found For This Brand");
+        }
+
+        return products;
+    }
+
+    public List<Product> getProductsByPriceRange(double minPrice,
+                                                 double maxPrice) {
+
+        List<Product> products =
+                productRepo.findByPriceBetween(minPrice, maxPrice);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No Products Found In This Price Range");
+        }
+
+        return products;
+    }
+
+    public List<Product> getOutOfStockProducts() {
+
+        List<Product> products = productRepo.findByStock(0);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No Out Of Stock Products");
+        }
+
+        return products;
+    }
+
+    public List<Product> sortByPriceAscending() {
+
+        return productRepo.findAll(
+                Sort.by(Sort.Direction.ASC, "price")
+        );
+    }
+
+    public List<Product> sortByPriceDescending() {
+
+        return productRepo.findAll(
+                Sort.by(Sort.Direction.DESC, "price")
+        );
+    }
+
+    public List<Product> sortByName() {
+
+        return productRepo.findAll(
+                Sort.by("name")
+        );
+    }
+
+    public List<Product> latestProducts() {
+
+        return productRepo.findAll(
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+    }
     }

@@ -58,6 +58,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if (jwtService.validateToken(token, userDetails)) {
                 System.out.println("Valid Token");
+                System.out.println("Authorities : " + userDetails.getAuthorities());
             } else {
                 System.out.println("Invalid Token");
             }

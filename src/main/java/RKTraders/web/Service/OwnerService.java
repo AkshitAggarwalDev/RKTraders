@@ -3,8 +3,11 @@ package RKTraders.web.Service;
 import RKTraders.web.DTO.OwnerLoginDTO;
 import RKTraders.web.DTO.PasswordUpdateDTO;
 import RKTraders.web.Model.Owner;
+import RKTraders.web.Model.Product;
 import RKTraders.web.Repositories.OwnerRepo;
 
+import RKTraders.web.Repositories.ProductRepo;
+import RKTraders.web.enums.ProductStatus;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +38,8 @@ public class OwnerService {
 
     @Value("${owner.ownerPassword}")
     private String ownerPassword;
-@PostConstruct
+
+    @PostConstruct
     public void CreateDefaultOwner() {
 
         if (ownerRepo.count() == 0) {
@@ -80,10 +84,6 @@ public class OwnerService {
 
         return "Invalid Password";
     }
-
-
-
-
 
 
     public Owner getProfile(String email) {
@@ -158,4 +158,18 @@ public class OwnerService {
 
     }
 
+    @Autowired
+    ProductRepo productRepo;
+
+    public String changeProductStatus(int productId, ProductStatus status) {
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setStatus(status);
+
+        productRepo.save(product);
+
+        return "Product status updated successfully";
+
+
+    }
 }

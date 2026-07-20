@@ -11,5 +11,9 @@ import java.util.List;
 public interface ProductRepo extends JpaRepository<Product,Integer> {
     long countByCategory(Category category);
     List<Product> findByCategory(Category category);
+        List<Product> findByNameContainingIgnoreCase(String name);
+    List<Product> findByBrandIgnoreCase(String brand);
+    List<Product> findByPriceBetween(double minPrice, double maxPrice);
+    List<Product> findByStock(int stock);
 
 }

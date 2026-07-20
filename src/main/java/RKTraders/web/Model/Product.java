@@ -1,6 +1,8 @@
 package RKTraders.web.Model;
 
 
+import RKTraders.web.enums.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,11 +31,20 @@ public class Product {
 
     private int stock;
 
-    private String imageURL;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<ProductImage> images;
 
     private String brand;
 
     private String color;
+
+    @OneToMany(mappedBy = "product")
+    @JsonIgnore
+    private List<CartItem> cartItems;
+
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status = ProductStatus.ACTIVE;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
