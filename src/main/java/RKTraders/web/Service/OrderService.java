@@ -42,7 +42,7 @@ public class OrderService {
 
 
 @Transactional
-    public ResponseEntity<OrderResponseDTO> placeOrder(String email) {
+    public Order placeOrder(String email) {
         Customer customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
@@ -150,7 +150,7 @@ public class OrderService {
     response.setTotalAmount(savedOrder.getTotalAmount());
     response.setOrderStatus(savedOrder.getOrderStatus());
 
-    return ResponseEntity.ok(response);
+    return savedOrder;
     }
 
     public List<Order> getMyOrders(String email) {

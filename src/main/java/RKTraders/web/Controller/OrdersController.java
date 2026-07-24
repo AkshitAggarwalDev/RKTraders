@@ -1,6 +1,5 @@
 package RKTraders.web.Controller;
 
-import RKTraders.web.DTO.OrderResponseDTO;
 import RKTraders.web.Model.Order;
 import RKTraders.web.Service.OrderService;
 import RKTraders.web.enums.OrderStatus;
@@ -22,7 +21,7 @@ public class OrdersController {
     OrderService orderService;
 
     @PostMapping("place")
-    public ResponseEntity<OrderResponseDTO> placeOrder(Authentication authentication){
+    public Order placeOrder(Authentication authentication){
 
         return orderService.placeOrder(authentication.getName());
 
