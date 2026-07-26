@@ -80,6 +80,20 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/orders/between-dates")
                         .hasAnyRole("OWNER", "ADMIN")
+                        .requestMatchers(
+                                "/payment/initiate/**",
+                                "/payment/verify/**",
+                                "/payment/my",
+                                "/payment/*"
+                        )
+                        .hasRole("CUSTOMER")
+
+                        .requestMatchers(
+                                "/payment/all",
+                                "/payment/status/**",
+                                "/payment/revenue"
+                        )
+                        .hasRole("OWNER")
                         .requestMatchers(HttpMethod.GET,
                                 "/orders/revenue",
                                 "/orders/count",

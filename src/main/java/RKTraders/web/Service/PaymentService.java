@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -101,5 +102,52 @@ CartService cartService;
         cartService.clearCart(email);
 
         return paymentRepo.save(payment);
+    }
+
+    public List<Payment> getMyPayments(String email) {
+
+        Customer customer = customerRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        return paymentRepo.findByCustomer(customer);
+    }
+
+    public Payment getPaymentById(String paymentId, String email) {
+
+        Customer customer = customerRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        Payment payment = paymentRepo.findByPaymentId(paymentId)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        if (payment.getCustomer().getId() != customer.getId()) {
+            throw new RuntimeException("Unauthorized Payment");
+        }
+
+        return payment;
+    }
+
+    public List<Payment> getAllPayments() {
+
+        return paymentRepo.findAll();
+
+    }
+
+    public List<Payment> getPaymentsByStatus(PaymentStatus paymentStatus) {
+
+        return paymentRepo.findByPaymentStatus(paymentStatus);
+
+    }
+
+    public Double getTotalRevenue() {
+
+        List<Payment> payments =
+                paymentRepo.findByPaymentStatus(PaymentStatus.SUCCESS);
+
+        double totalRevenue = payments.stream()
+                .mapToDouble(Payment::getAmount)
+                .sum();
+
+        return totalRevenue;
     }
 }
