@@ -1,16 +1,13 @@
 package RKTraders.web.Model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
-
-@Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode(exclude = {"customer", "cartItems"})
+@ToString(exclude = {"customer", "cartItems"})
+@Entity
 
 public class Cart {
 

@@ -1,5 +1,5 @@
 package RKTraders.web.enums;
 
 public enum AddressType {
-    HOME,OFFICE
+    HOME,OFFICE,WORK
 }

@@ -83,8 +83,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/payment/initiate/**",
                                 "/payment/verify/**",
-                                "/payment/my",
-                                "/payment/*"
+                                "/payment/my"
                         )
                         .hasRole("CUSTOMER")
 

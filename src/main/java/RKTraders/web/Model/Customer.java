@@ -1,14 +1,13 @@
 package RKTraders.web.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode(exclude = "cart")
+@ToString(exclude = "cart")
 @Entity
 public class Customer{
 
@@ -20,10 +19,12 @@ public class Customer{
 
     private String email;
 
+@JsonIgnore
     private String password;
 
     private String role;
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Cart cart;
 
 }

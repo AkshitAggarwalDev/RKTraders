@@ -2,10 +2,7 @@ package RKTraders.web.Service;
 
 import RKTraders.web.DTO.OrderResponseDTO;
 import RKTraders.web.Model.*;
-import RKTraders.web.Repositories.AddressRepo;
-import RKTraders.web.Repositories.CartRepo;
-import RKTraders.web.Repositories.CustomerRepo;
-import RKTraders.web.Repositories.PaymentRepo;
+import RKTraders.web.Repositories.*;
 import RKTraders.web.enums.PaymentMethod;
 import RKTraders.web.enums.PaymentStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +22,8 @@ public class PaymentService {
     CartRepo cartRepo;
     @Autowired
     PaymentRepo paymentRepo;
+    @Autowired
+    CartItemRepo cartItemRepo;
 
     public Payment initiatePayment(Integer addressId, String email) {
 
@@ -38,24 +37,22 @@ public class PaymentService {
             throw new RuntimeException("This address does not belong to the logged-in customer");
         }
 
-        Cart cart = cartRepo.findByCustomer(customer)
+        Cart cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        if (cart.getCartItems().isEmpty()) {
+        List<CartItem> cartItems = cartItemRepo.findByCartId(cart.getId());
+
+        if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
+        double totalAmount = cartItems.stream()
+                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
+                .sum();
 
         Payment payment = new Payment();
 
-        double totalAmount = cart.getCartItems()
-                .stream()
-                .mapToDouble(item ->
-                        item.getProduct().getPrice() * item.getQuantity())
-                .sum();
-
         payment.setAmount(totalAmount);
-
         payment.setPaymentMethod(PaymentMethod.UPI);
         payment.setPaymentStatus(PaymentStatus.PENDING);
         payment.setUpiId("rktraders@okaxis");
@@ -98,8 +95,6 @@ CartService cartService;
         Order order = orderService.placeOrder(email);
 
         payment.setOrder(order);
-
-        cartService.clearCart(email);
 
         return paymentRepo.save(payment);
     }

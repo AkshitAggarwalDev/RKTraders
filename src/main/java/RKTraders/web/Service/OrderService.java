@@ -41,11 +41,11 @@ public class OrderService {
 
 
 
-@Transactional
+    @Transactional
     public Order placeOrder(String email) {
+
         Customer customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
-
 
         Cart cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
@@ -56,8 +56,7 @@ public class OrderService {
             throw new RuntimeException("Cart is empty");
         }
 
-
-// Product Status check  :
+        // Product Status Validation
         for (CartItem item : cartItems) {
 
             Product product = item.getProduct();
@@ -65,43 +64,34 @@ public class OrderService {
             if (product.getStatus() != ProductStatus.ACTIVE) {
                 throw new RuntimeException(product.getName() + " is currently unavailable");
             }
-            ;
         }
 
-// Stock Validation :
+        // Stock Validation
         for (CartItem item : cartItems) {
 
             Product product = item.getProduct();
 
             if (item.getQuantity() > product.getStock()) {
-                throw new RuntimeException(
-                        product.getName() + " has insufficient stock"
-                );
+                throw new RuntimeException(product.getName() + " has insufficient stock");
             }
         }
 
-// Total Calculation :
+        // Calculate Total Amount
         double totalAmount = 0;
 
         for (CartItem item : cartItems) {
-
-            totalAmount +=
-                    item.getProduct().getPrice()
-                            * item.getQuantity();
-
+            totalAmount += item.getProduct().getPrice() * item.getQuantity();
         }
-// Creating and Saving Orders :
 
+        // Create Order
         Order order = new Order();
-
         order.setCustomer(customer);
         order.setTotalAmount(totalAmount);
         order.setOrderStatus(OrderStatus.PLACED);
 
         Order savedOrder = orderRepo.save(order);
 
-
-// Creating and Saving OrderItems :
+        // Create Order Items
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (CartItem item : cartItems) {
@@ -109,48 +99,34 @@ public class OrderService {
             Product product = item.getProduct();
 
             OrderItem orderItem = new OrderItem();
-
             orderItem.setOrder(savedOrder);
             orderItem.setProduct(product);
             orderItem.setProductName(product.getName());
             orderItem.setProductPrice(product.getPrice());
             orderItem.setQuantity(item.getQuantity());
-            orderItem.setTotalPrice(
-                    product.getPrice() * item.getQuantity());
+            orderItem.setTotalPrice(product.getPrice() * item.getQuantity());
 
             orderItems.add(orderItem);
-
         }
 
         orderItemRepo.saveAll(orderItems);
 
         savedOrder.setOrderItems(orderItems);
 
-        orderRepo.save(savedOrder);
-
-
+        // Update Product Stock
         for (CartItem item : cartItems) {
 
             Product product = item.getProduct();
 
-            product.setStock(
-                    product.getStock() - item.getQuantity()
-            );
+            product.setStock(product.getStock() - item.getQuantity());
 
             productRepo.save(product);
-
         }
 
+        // Clear Cart
         cartItemRepo.deleteAll(cartItems);
 
-    OrderResponseDTO response = new OrderResponseDTO();
-
-    response.setMessage("Order Placed Successfully");
-    response.setOrderId(savedOrder.getId());
-    response.setTotalAmount(savedOrder.getTotalAmount());
-    response.setOrderStatus(savedOrder.getOrderStatus());
-
-    return savedOrder;
+        return savedOrder;
     }
 
     public List<Order> getMyOrders(String email) {

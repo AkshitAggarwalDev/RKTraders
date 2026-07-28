@@ -16,7 +16,7 @@ public class AddressController {
     @Autowired
     AddressService addressService;
 
-    @PostMapping
+    @PostMapping("addAddress")
     public ResponseEntity<Address> addAddress(@RequestBody Address address,
                                               Authentication authentication) {
 
