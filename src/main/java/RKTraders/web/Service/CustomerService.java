@@ -3,6 +3,7 @@ package RKTraders.web.Service;
 import RKTraders.web.DTO.LoginRequestDTO;
 import RKTraders.web.DTO.PasswordUpdateDTO;
 import RKTraders.web.DTO.RegisterRequestDTO;
+import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Model.Customer;
 import RKTraders.web.Repositories.CustomerRepo;
 
@@ -37,7 +38,7 @@ public class CustomerService implements UserDetailsService {
         Optional<Customer> user = customerRepo.findByEmail(username);
 
         if(user.isEmpty()){
-            throw new UsernameNotFoundException("User Not Found");
+            throw new ResourceNotFoundException("User Not Found");
         }
 
         return new UserPrincipal(user.get());
@@ -86,7 +87,7 @@ public class CustomerService implements UserDetailsService {
                 customerRepo.findByEmail(email);
 
         if(customer.isEmpty()){
-            throw new UsernameNotFoundException("You are not registered yet,Register yourself first ! ");
+            throw new ResourceNotFoundException("You are not registered yet,Register yourself first ! ");
         }
         return customer.get();
     }

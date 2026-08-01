@@ -1,5 +1,8 @@
 package RKTraders.web.Service;
 
+import RKTraders.web.Exceptions.BadRequestException;
+import RKTraders.web.Exceptions.ResourceNotFoundException;
+import RKTraders.web.Exceptions.UnauthorizedException;
 import RKTraders.web.Model.Cart;
 import RKTraders.web.Model.CartItem;
 import RKTraders.web.Model.Customer;
@@ -90,15 +93,15 @@ public class CartService {
     public List<CartItem> viewCart(String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Cart cart = cartRepo.findByCustomerId(customer.getId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItem> cartItems = cartItemRepo.findByCartId(cart.getId());
 
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new BadRequestException("Cart is empty");
         }
 
         return cartItems;
@@ -108,24 +111,24 @@ public class CartService {
     public String updateQuantity(String email, int cartItemId, int quantity) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Cart cart = cartRepo.findByCustomerId(customer.getId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         CartItem cartItem = cartItemRepo.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Cart Item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart Item not found"));
 
         if (cartItem.getCart().getId() != cart.getId()) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         if (quantity <= 0) {
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new BadRequestException("Quantity must be greater than zero");
         }
 
         if (quantity > cartItem.getProduct().getStock()) {
-            throw new RuntimeException("Insufficient stock available");
+            throw new BadRequestException("Insufficient stock available");
         }
 
         cartItem.setQuantity(quantity);
@@ -138,16 +141,16 @@ public class CartService {
     public String removeItem(String email, int cartItemId) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Cart cart = cartRepo.findByCustomerId(customer.getId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         CartItem cartItem = cartItemRepo.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Cart Item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart Item not found"));
 
         if (cartItem.getCart().getId() != cart.getId()) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         cartItemRepo.delete(cartItem);
@@ -158,15 +161,15 @@ public class CartService {
     public String clearCart(String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Cart cart = cartRepo.findByCustomerId(customer.getId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItem> cartItems = cartItemRepo.findByCartId(cart.getId());
 
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is already empty");
+            throw new BadRequestException("Cart is already empty");
         }
 
         cartItemRepo.deleteAll(cartItems);
@@ -177,15 +180,15 @@ public class CartService {
     public double cartTotal(String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Cart cart = cartRepo.findByCustomerId(customer.getId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItem> cartItems = cartItemRepo.findByCartId(cart.getId());
 
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new BadRequestException("Cart is empty");
         }
 
         double total = 0;

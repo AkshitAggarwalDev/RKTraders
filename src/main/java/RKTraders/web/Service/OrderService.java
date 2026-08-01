@@ -1,6 +1,8 @@
 package RKTraders.web.Service;
 
 import RKTraders.web.DTO.OrderResponseDTO;
+import RKTraders.web.Exceptions.BadRequestException;
+import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Model.*;
 import RKTraders.web.Repositories.*;
 import RKTraders.web.enums.OrderStatus;
@@ -45,15 +47,15 @@ public class OrderService {
     public Order placeOrder(String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Cart cart = cartRepo.findByCustomerId(customer.getId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItem> cartItems = cartItemRepo.findByCartId(cart.getId());
 
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new BadRequestException("Cart is empty");
         }
 
         // Product Status Validation
@@ -62,7 +64,7 @@ public class OrderService {
             Product product = item.getProduct();
 
             if (product.getStatus() != ProductStatus.ACTIVE) {
-                throw new RuntimeException(product.getName() + " is currently unavailable");
+                throw new BadRequestException(product.getName() + " is currently unavailable");
             }
         }
 
@@ -72,7 +74,7 @@ public class OrderService {
             Product product = item.getProduct();
 
             if (item.getQuantity() > product.getStock()) {
-                throw new RuntimeException(product.getName() + " has insufficient stock");
+                throw new BadRequestException(product.getName() + " has insufficient stock");
             }
         }
 
@@ -132,12 +134,12 @@ public class OrderService {
     public List<Order> getMyOrders(String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         List<Order> orders = orderRepo.findByCustomerId(customer.getId());
 
         if (orders.isEmpty()) {
-            throw new RuntimeException("No Orders Found");
+            throw new ResourceNotFoundException("No Orders Found");
         }
 
         return orders;
@@ -153,10 +155,10 @@ public class OrderService {
     public String cancelOrder(int orderId, String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found!"));
 
         Order order = orderRepo.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
 
         // Check ownership
         if (order.getCustomer().getId() != customer.getId()) {
@@ -197,7 +199,7 @@ public class OrderService {
         List<Order> orders = orderRepo.findAll();
 
         if (orders.isEmpty()) {
-            throw new RuntimeException("No orders found!");
+            throw new ResourceNotFoundException("No orders found!");
         }
 
         return orderRepo.findAll(Sort.by(Sort.Direction.DESC, "orderDate"));
@@ -208,7 +210,7 @@ public class OrderService {
         List<Order> orders = orderRepo.findByOrderStatus(status);
 
         if (orders.isEmpty()) {
-            throw new RuntimeException("No orders found with status : " + status);
+            throw new ResourceNotFoundException("No orders found with status : " + status);
         }
 
         return orders;
@@ -217,7 +219,7 @@ public class OrderService {
     public String updateOrderStatus(int orderId, OrderStatus status) {
 
         Order order = orderRepo.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
 
         order.setOrderStatus(status);
 
@@ -232,7 +234,7 @@ public class OrderService {
     public long countMyOrders(String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         return orderRepo.countByCustomer(customer);
 

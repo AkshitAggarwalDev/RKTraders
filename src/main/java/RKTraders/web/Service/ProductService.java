@@ -1,5 +1,7 @@
 package RKTraders.web.Service;
 
+import RKTraders.web.Exceptions.BadRequestException;
+import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Model.Category;
 import RKTraders.web.Model.Product;
 import RKTraders.web.Repositories.CategoryRepo;
@@ -71,7 +73,7 @@ public class ProductService {
                 categoryRepo.findById(categoryId);
 
         if (category.isEmpty()) {
-            throw new RuntimeException("Category Not Found");
+            throw new ResourceNotFoundException("Category Not Found");
         }
 
         return productRepo.findByCategory(category.get());
@@ -83,7 +85,7 @@ public class ProductService {
         Optional<Category> category = categoryRepo.findById(categoryId);
 
         if (category.isEmpty()) {
-            throw new RuntimeException("Category Not Found");
+            throw new ResourceNotFoundException("Category Not Found");
         }
 
         return productRepo.countByCategory(category.get());
@@ -103,7 +105,7 @@ public class ProductService {
         List<Product> products = productRepo.findByNameContainingIgnoreCase(name);
 
         if (products.isEmpty()) {
-            throw new RuntimeException("No Product Found");
+            throw new ResourceNotFoundException("No Product Found");
         }
 
         return products;
@@ -114,7 +116,7 @@ public class ProductService {
         List<Product> products = productRepo.findByBrandIgnoreCase(brand);
 
         if (products.isEmpty()) {
-            throw new RuntimeException("No Products Found For This Brand");
+            throw new ResourceNotFoundException("No Products Found For This Brand");
         }
 
         return products;
@@ -127,7 +129,7 @@ public class ProductService {
                 productRepo.findByPriceBetween(minPrice, maxPrice);
 
         if (products.isEmpty()) {
-            throw new RuntimeException("No Products Found In This Price Range");
+            throw new ResourceNotFoundException("No Products Found In This Price Range");
         }
 
         return products;
@@ -138,7 +140,7 @@ public class ProductService {
         List<Product> products = productRepo.findByStock(0);
 
         if (products.isEmpty()) {
-            throw new RuntimeException("No Out Of Stock Products");
+            throw new BadRequestException("No Out Of Stock Products");
         }
 
         return products;

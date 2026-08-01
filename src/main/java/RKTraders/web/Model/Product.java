@@ -46,6 +46,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Review> reviews;
 @CreationTimestamp
     private LocalDateTime createdAt;
 @UpdateTimestamp

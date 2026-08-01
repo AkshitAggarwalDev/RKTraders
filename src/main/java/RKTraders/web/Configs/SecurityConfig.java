@@ -87,6 +87,9 @@ public class SecurityConfig {
                         )
                         .hasRole("CUSTOMER")
 
+                        .requestMatchers("/inventory/**")
+                        .hasAnyRole("OWNER", "ADMIN")
+
                         .requestMatchers(
                                 "/payment/all",
                                 "/payment/status/**",

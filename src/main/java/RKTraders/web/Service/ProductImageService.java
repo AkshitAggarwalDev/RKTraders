@@ -1,5 +1,6 @@
 package RKTraders.web.Service;
 
+import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Model.Product;
 import RKTraders.web.Model.ProductImage;
 import RKTraders.web.Repositories.ProductImageRepo;
@@ -37,7 +38,7 @@ public class ProductImageService {
         public String uploadImage(int productId, MultipartFile image) throws IOException {
 
             Product product = productRepo.findById(productId)
-                    .orElseThrow(() -> new RuntimeException("Product Not Found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
 
             String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
 
@@ -63,12 +64,12 @@ public class ProductImageService {
     public List<ProductImage> getImagesByProductId(int productId) {
 
         Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         List<ProductImage> images = productImageRepo.findByProductId(productId);
 
         if (images.isEmpty()) {
-            throw new RuntimeException("No images found for this product");
+            throw new ResourceNotFoundException("No images found for this product");
         }
 
         return images;
@@ -77,7 +78,7 @@ public class ProductImageService {
     public String deleteImage(int imageId) throws IOException {
 
         ProductImage image = productImageRepo.findById(imageId)
-                .orElseThrow(() -> new RuntimeException("Image not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found"));
 
         Path path = Paths.get("uploads", image.getImageUrl());
 
@@ -93,7 +94,7 @@ public class ProductImageService {
     public String setPrimaryImage(int imageId) {
 
         ProductImage selectedImage = productImageRepo.findById(imageId)
-                .orElseThrow(() -> new RuntimeException("Image not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found"));
 
         int productId = selectedImage.getProduct().getId();
 

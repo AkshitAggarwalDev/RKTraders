@@ -1,5 +1,7 @@
 package RKTraders.web.Service;
 
+import RKTraders.web.Exceptions.DuplicateResourceException;
+import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Model.Category;
 import RKTraders.web.Repositories.CategoryRepo;
 import RKTraders.web.Repositories.ProductRepo;
@@ -40,7 +42,7 @@ public class CategoryService {
         if (existing.isPresent() &&
                 existing.get().getId() != id) {
 
-            throw new RuntimeException("Category Already Exists");
+            throw new DuplicateResourceException("Category Already Exists");
         }
 
         Category existingCategory = categoryRepo.findById(id).orElse(null);
@@ -84,7 +86,7 @@ public class CategoryService {
                 categoryRepo.findByNameIgnoreCase(name);
 
         if (category.isEmpty()) {
-            throw new RuntimeException("Category Not Found");
+            throw new ResourceNotFoundException("Category Not Found");
         }
 
         return category.get();

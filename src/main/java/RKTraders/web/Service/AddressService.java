@@ -1,5 +1,7 @@
 package RKTraders.web.Service;
 
+import RKTraders.web.Exceptions.ResourceNotFoundException;
+import RKTraders.web.Exceptions.UnauthorizedException;
 import RKTraders.web.Model.Address;
 import RKTraders.web.Model.Customer;
 import RKTraders.web.Repositories.AddressRepo;
@@ -22,7 +24,7 @@ import java.util.Optional;
         public Address addAddress(Address address, String email) {
 
             Customer customer = customerRepo.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Customer not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
             address.setCustomer(customer);
 
@@ -54,7 +56,7 @@ import java.util.Optional;
     public List<Address> getMyAddresses(String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         return addressRepo.findByCustomer(customer);
 
@@ -63,13 +65,13 @@ import java.util.Optional;
     public Address getAddressById(Integer addressId, String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Address address = addressRepo.findById(addressId)
-                .orElseThrow(() -> new RuntimeException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         return address;
@@ -81,13 +83,13 @@ import java.util.Optional;
                                  String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Address address = addressRepo.findById(addressId)
-                .orElseThrow(() -> new RuntimeException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         address.setFullName(updatedAddress.getFullName());
@@ -108,13 +110,13 @@ import java.util.Optional;
     public String deleteAddress(Integer addressId, String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Address address = addressRepo.findById(addressId)
-                .orElseThrow(() -> new RuntimeException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         addressRepo.delete(address);
@@ -126,13 +128,13 @@ import java.util.Optional;
     public Address setDefaultAddress(Integer addressId, String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Address address = addressRepo.findById(addressId)
-                .orElseThrow(() -> new RuntimeException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         List<Address> addresses = addressRepo.findByCustomer(customer);

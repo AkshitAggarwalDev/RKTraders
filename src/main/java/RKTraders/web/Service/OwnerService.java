@@ -2,6 +2,7 @@ package RKTraders.web.Service;
 
 import RKTraders.web.DTO.OwnerLoginDTO;
 import RKTraders.web.DTO.PasswordUpdateDTO;
+import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Model.Owner;
 import RKTraders.web.Model.Product;
 import RKTraders.web.Repositories.OwnerRepo;
@@ -163,7 +164,7 @@ public class OwnerService {
 
     public String changeProductStatus(int productId, ProductStatus status) {
         Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         product.setStatus(status);
 
         productRepo.save(product);

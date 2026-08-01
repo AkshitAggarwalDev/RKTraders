@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(exclude = "cart")
 @ToString(exclude = "cart")
@@ -23,6 +25,12 @@ public class Customer{
     private String password;
 
     private String role;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Review> reviews;
+
+
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
     @JsonIgnore
     private Cart cart;

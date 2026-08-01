@@ -1,6 +1,10 @@
 package RKTraders.web.Service;
 
 import RKTraders.web.DTO.OrderResponseDTO;
+import RKTraders.web.Exceptions.BadRequestException;
+import RKTraders.web.Exceptions.ForbiddenException;
+import RKTraders.web.Exceptions.ResourceNotFoundException;
+import RKTraders.web.Exceptions.UnauthorizedException;
 import RKTraders.web.Model.*;
 import RKTraders.web.Repositories.*;
 import RKTraders.web.enums.PaymentMethod;
@@ -28,22 +32,22 @@ public class PaymentService {
     public Payment initiatePayment(Integer addressId, String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Address address = addressRepo.findById(addressId)
-                .orElseThrow(() -> new RuntimeException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
-            throw new RuntimeException("This address does not belong to the logged-in customer");
+            throw new ForbiddenException("This address does not belong to the logged-in customer");
         }
 
         Cart cart = cartRepo.findByCustomerId(customer.getId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItem> cartItems = cartItemRepo.findByCartId(cart.getId());
 
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new BadRequestException("Cart is empty");
         }
 
         double totalAmount = cartItems.stream()
@@ -69,21 +73,21 @@ CartService cartService;
     public Payment verifyPayment(String paymentId, String transactionId, String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Payment payment = paymentRepo.findByPaymentId(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
         if (payment.getCustomer().getId() != customer.getId()) {
-            throw new RuntimeException("Unauthorized Payment");
+            throw new UnauthorizedException("Unauthorized Payment");
         }
 
         if (payment.getPaymentStatus() == PaymentStatus.SUCCESS) {
-            throw new RuntimeException("Payment already verified");
+            throw new BadRequestException("Payment already verified");
         }
 
         if (paymentRepo.findByTransactionId(transactionId).isPresent()) {
-            throw new RuntimeException("Transaction ID already exists");
+            throw new BadRequestException("Transaction ID already exists");
         }
 
         payment.setTransactionId(transactionId);
@@ -102,7 +106,7 @@ CartService cartService;
     public List<Payment> getMyPayments(String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         return paymentRepo.findByCustomer(customer);
     }
@@ -110,13 +114,13 @@ CartService cartService;
     public Payment getPaymentById(String paymentId, String email) {
 
         Customer customer = customerRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Payment payment = paymentRepo.findByPaymentId(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
         if (payment.getCustomer().getId() != customer.getId()) {
-            throw new RuntimeException("Unauthorized Payment");
+            throw new UnauthorizedException("Unauthorized Payment");
         }
 
         return payment;

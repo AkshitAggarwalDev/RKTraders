@@ -1,5 +1,6 @@
 package RKTraders.web.Service;
 
+import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Model.Customer;
 import RKTraders.web.Model.Owner;
 import RKTraders.web.Repositories.CustomerRepo;
@@ -37,6 +38,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             return new UserPrincipal(owner.get());
         }
 
-        throw new UsernameNotFoundException("User Not Found");
+        throw new ResourceNotFoundException("User Not Found");
     }
 }
