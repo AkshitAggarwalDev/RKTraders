@@ -10,16 +10,16 @@ import lombok.NoArgsConstructor;
 
         private Double averageRating;
 
-        private Long totalReviews;
+        private Integer totalReviews;
 
-        private Long fiveStar;
+        private Integer fiveStar;
 
-        private Long fourStar;
+        private Integer fourStar;
 
-        private Long threeStar;
+        private Integer threeStar;
 
-        private Long twoStar;
+        private Integer twoStar;
 
-        private Long oneStar;
+        private Integer oneStar;
 
     }

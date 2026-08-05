@@ -87,6 +87,18 @@ public class SecurityConfig {
                         )
                         .hasRole("CUSTOMER")
 
+                        .requestMatchers(HttpMethod.GET,
+                                "/review/**")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.POST,
+                                "/review/**")
+                        .hasRole("CUSTOMER")
+
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/review/**")
+                        .hasRole("CUSTOMER")
+
                         .requestMatchers("/inventory/**")
                         .hasAnyRole("OWNER", "ADMIN")
 
