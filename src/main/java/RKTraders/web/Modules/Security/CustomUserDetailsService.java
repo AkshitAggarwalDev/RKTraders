@@ -1,8 +1,10 @@
 package RKTraders.web.Modules.Security;
 
 import RKTraders.web.Exceptions.ResourceNotFoundException;
-import RKTraders.web.Modules.Customer.Entity;
-import RKTraders.web.Modules.Customer.Repo;
+import RKTraders.web.Modules.Customer.CustomerEntity;
+import RKTraders.web.Modules.Customer.CustomerRepo;
+import RKTraders.web.Modules.Owner.OwnerEntity;
+import RKTraders.web.Modules.Owner.OwnerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,22 +17,22 @@ import java.util.Optional;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private Repo customerRepo;
+    private CustomerRepo customerRepo;
 
     @Autowired
-    private RKTraders.web.Modules.Owner.Repo ownerRepo;
+    private OwnerRepo ownerRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        Optional<Entity> customer = customerRepo.findByEmail(username);
+        Optional<CustomerEntity> customer = customerRepo.findByEmail(username);
 
         if (customer.isPresent()) {
             return new UserPrincipal(customer.get());
         }
 
-        Optional<RKTraders.web.Modules.Owner.Entity> owner = ownerRepo.findByOwnerEmail(username);
+        Optional<OwnerEntity> owner = ownerRepo.findByOwnerEmail(username);
 
         if (owner.isPresent()) {
             return new UserPrincipal(owner.get());

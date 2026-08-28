@@ -1,10 +1,16 @@
 package RKTraders.web.Modules.Order;
 
+import RKTraders.web.Modules.Cart.CartEntity;
 import RKTraders.web.Modules.Cart.CartItemEntity;
 import RKTraders.web.Modules.Cart.CartItemRepo;
 import RKTraders.web.Exceptions.BadRequestException;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
+import RKTraders.web.Modules.Cart.CartRepo;
+import RKTraders.web.Modules.Customer.CustomerEntity;
+import RKTraders.web.Modules.Customer.CustomerRepo;
 import RKTraders.web.Modules.Owner.OrderStatus;
+import RKTraders.web.Modules.Product.ProductEntity;
+import RKTraders.web.Modules.Product.ProductRepo;
 import RKTraders.web.Modules.Product.ProductStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,33 +27,33 @@ public class OrderService {
 
 
     @Autowired
-    RKTraders.web.Modules.Customer.Repo customerRepo;
+    CustomerRepo customerRepo;
 
 
     @Autowired
-    RKTraders.web.Modules.Cart.Repo cartRepo;
+    CartRepo cartRepo;
 
     @Autowired
     CartItemRepo cartItemRepo;
 
     @Autowired
-    Repo orderRepo;
+    OrderRepo orderRepo;
 
     @Autowired
     OrderItemRepo orderItemRepo;
 
     @Autowired
-    RKTraders.web.Modules.Product.Repo productRepo;
+    ProductRepo productRepo;
 
 
 
     @Transactional
-    public Entity placeOrder(String email) {
+    public OrderEntity placeOrder(String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        RKTraders.web.Modules.Cart.Entity cart = cartRepo.findByCustomerId(customer.getId())
+        CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItemEntity> cartItems = cartItemRepo.findByCartId(cart.getId());
@@ -59,7 +65,7 @@ public class OrderService {
         // Product Status Validation
         for (CartItemEntity item : cartItems) {
 
-            RKTraders.web.Modules.Product.Entity product = item.getProduct();
+            ProductEntity product = item.getProduct();
 
             if (product.getStatus() != ProductStatus.ACTIVE) {
                 throw new BadRequestException(product.getName() + " is currently unavailable");
@@ -69,7 +75,7 @@ public class OrderService {
         // Stock Validation
         for (CartItemEntity item : cartItems) {
 
-            RKTraders.web.Modules.Product.Entity product = item.getProduct();
+            ProductEntity product = item.getProduct();
 
             if (item.getQuantity() > product.getStock()) {
                 throw new BadRequestException(product.getName() + " has insufficient stock");
@@ -84,19 +90,19 @@ public class OrderService {
         }
 
         // Create Order
-        Entity order = new Entity();
+        OrderEntity order = new OrderEntity();
         order.setCustomer(customer);
         order.setTotalAmount(totalAmount);
         order.setOrderStatus(OrderStatus.PLACED);
 
-        Entity savedOrder = orderRepo.save(order);
+        OrderEntity savedOrder = orderRepo.save(order);
 
         // Create Order Items
         List<OrderItemEntity> orderItems = new ArrayList<>();
 
         for (CartItemEntity item : cartItems) {
 
-            RKTraders.web.Modules.Product.Entity product = item.getProduct();
+            ProductEntity product = item.getProduct();
 
             OrderItemEntity orderItem = new OrderItemEntity();
             orderItem.setOrder(savedOrder);
@@ -116,7 +122,7 @@ public class OrderService {
         // Update Product Stock
         for (CartItemEntity item : cartItems) {
 
-            RKTraders.web.Modules.Product.Entity product = item.getProduct();
+            ProductEntity product = item.getProduct();
 
             product.setStock(product.getStock() - item.getQuantity());
 
@@ -129,12 +135,12 @@ public class OrderService {
         return savedOrder;
     }
 
-    public List<Entity> getMyOrders(String email) {
+    public List<OrderEntity> getMyOrders(String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        List<Entity> orders = orderRepo.findByCustomerId(customer.getId());
+        List<OrderEntity> orders = orderRepo.findByCustomerId(customer.getId());
 
         if (orders.isEmpty()) {
             throw new ResourceNotFoundException("No Orders Found");
@@ -144,7 +150,7 @@ public class OrderService {
     }
 
 
-    public Optional<Entity> getOrderById(Integer id){
+    public Optional<OrderEntity> getOrderById(Integer id){
     return orderRepo.findById(id);
 
     }
@@ -152,10 +158,10 @@ public class OrderService {
     @Transactional
     public String cancelOrder(int orderId, String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found!"));
 
-        Entity order = orderRepo.findById(orderId)
+        OrderEntity order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
 
         // Check ownership
@@ -176,7 +182,7 @@ public class OrderService {
         // Restore stock
         for (OrderItemEntity item : order.getOrderItems()) {
 
-            RKTraders.web.Modules.Product.Entity product = item.getProduct();
+            ProductEntity product = item.getProduct();
 
             product.setStock(
                     product.getStock() + item.getQuantity()
@@ -192,9 +198,9 @@ public class OrderService {
         return "Order cancelled successfully.";
     }
 
-    public List<Entity> getAllOrders() {
+    public List<OrderEntity> getAllOrders() {
 
-        List<Entity> orders = orderRepo.findAll();
+        List<OrderEntity> orders = orderRepo.findAll();
 
         if (orders.isEmpty()) {
             throw new ResourceNotFoundException("No orders found!");
@@ -203,9 +209,9 @@ public class OrderService {
         return orderRepo.findAll(Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 
-    public List<Entity> getOrdersByStatus(OrderStatus status) {
+    public List<OrderEntity> getOrdersByStatus(OrderStatus status) {
 
-        List<Entity> orders = orderRepo.findByOrderStatus(status);
+        List<OrderEntity> orders = orderRepo.findByOrderStatus(status);
 
         if (orders.isEmpty()) {
             throw new ResourceNotFoundException("No orders found with status : " + status);
@@ -216,7 +222,7 @@ public class OrderService {
 
     public String updateOrderStatus(int orderId, OrderStatus status) {
 
-        Entity order = orderRepo.findById(orderId)
+        OrderEntity order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found!"));
 
         order.setOrderStatus(status);
@@ -231,7 +237,7 @@ public class OrderService {
     }
     public long countMyOrders(String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         return orderRepo.countByCustomer(customer);
@@ -240,11 +246,11 @@ public class OrderService {
 
     public Double getTotalRevenue() {
 
-        List<Entity> orders = orderRepo.findAll();
+        List<OrderEntity> orders = orderRepo.findAll();
 
         double totalRevenue = 0;
 
-        for (Entity order : orders) {
+        for (OrderEntity order : orders) {
 
             if (order.getOrderStatus() == OrderStatus.PLACED) {
 
@@ -257,20 +263,20 @@ public class OrderService {
         return totalRevenue;
     }
 
-    public List<Entity> getRecentOrders() {
+    public List<OrderEntity> getRecentOrders() {
 
         return orderRepo.findTop10ByOrderByOrderDateDesc();
 
     }
-    public List<Entity> getTodayOrders() {
+    public List<OrderEntity> getTodayOrders() {
 
-        List<Entity> orders = orderRepo.findAll();
+        List<OrderEntity> orders = orderRepo.findAll();
 
-        List<Entity> todayOrders = new ArrayList<>();
+        List<OrderEntity> todayOrders = new ArrayList<>();
 
         LocalDate today = LocalDate.now();
 
-        for (Entity order : orders) {
+        for (OrderEntity order : orders) {
 
             if (order.getOrderDate().toLocalDate().equals(today)) {
 
@@ -284,14 +290,14 @@ public class OrderService {
 
     }
 
-    public List<Entity> getOrdersBetweenDates(LocalDate startDate,
-                                              LocalDate endDate) {
+    public List<OrderEntity> getOrdersBetweenDates(LocalDate startDate,
+                                                   LocalDate endDate) {
 
-        List<Entity> orders = orderRepo.findAll();
+        List<OrderEntity> orders = orderRepo.findAll();
 
-        List<Entity> filteredOrders = new ArrayList<>();
+        List<OrderEntity> filteredOrders = new ArrayList<>();
 
-        for (Entity order : orders) {
+        for (OrderEntity order : orders) {
 
             LocalDate orderDate = order.getOrderDate().toLocalDate();
 

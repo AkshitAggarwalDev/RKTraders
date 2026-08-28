@@ -1,10 +1,14 @@
 package RKTraders.web.Modules.Review;
 
+import RKTraders.web.Modules.Customer.CustomerEntity;
+import RKTraders.web.Modules.Customer.CustomerRepo;
 import RKTraders.web.Modules.Customer.ReviewRequestDTO;
 import RKTraders.web.Modules.Owner.ReviewSummaryDTO;
 import RKTraders.web.Exceptions.BadRequestException;
 import RKTraders.web.Exceptions.DuplicateResourceException;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
+import RKTraders.web.Modules.Product.ProductEntity;
+import RKTraders.web.Modules.Product.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,22 +18,22 @@ import java.util.Optional;
 @Service
 public class ReviewService {
     @Autowired
-    RKTraders.web.Modules.Customer.Repo customerRepo;
+    CustomerRepo customerRepo;
     @Autowired
-    RKTraders.web.Modules.Product.Repo productRepo;
+    ProductRepo productRepo;
     @Autowired
-    Repo reviewRepo;
+    ReviewRepo reviewRepo;
     public String addReview(String email, Integer productId, ReviewRequestDTO reviewRequestDTO) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Customer not found"));
 
-        RKTraders.web.Modules.Product.Entity product = productRepo.findById(productId)
+        ProductEntity product = productRepo.findById(productId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found"));
 
-        Optional<Entity> existingReview =
+        Optional<ReviewEntity> existingReview =
                 reviewRepo.findByCustomerIdAndProductId(
                         customer.getId(),
                         product.getId()
@@ -39,7 +43,7 @@ public class ReviewService {
             throw new DuplicateResourceException("You have already reviewed this product");
         }
 
-        Entity review = new Entity();
+        ReviewEntity review = new ReviewEntity();
         review.setCustomer(customer);
         review.setProduct(product);
         review.setRating(reviewRequestDTO.getRating());
@@ -50,11 +54,11 @@ public class ReviewService {
 
     public ReviewSummaryDTO getReviewSummary(Integer productId) {
 
-        RKTraders.web.Modules.Product.Entity product = productRepo.findById(productId)
+        ProductEntity product = productRepo.findById(productId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found"));
 
-        List<Entity> reviews = reviewRepo.findByProductId(productId);
+        List<ReviewEntity> reviews = reviewRepo.findByProductId(productId);
 
         ReviewSummaryDTO dto = new ReviewSummaryDTO();
 
@@ -74,7 +78,7 @@ public class ReviewService {
 
         double totalRating = 0;
 
-        for (Entity review : reviews) {
+        for (ReviewEntity review : reviews) {
 
             totalRating += review.getRating();
 
@@ -100,13 +104,13 @@ public class ReviewService {
         return dto;
     }
 
-    public List<Entity> getReviews(Integer productId) {
+    public List<ReviewEntity> getReviews(Integer productId) {
 
-        RKTraders.web.Modules.Product.Entity product = productRepo.findById(productId)
+        ProductEntity product = productRepo.findById(productId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product not found"));
 
-        List<Entity> reviews = reviewRepo.findByProductId(productId);
+        List<ReviewEntity> reviews = reviewRepo.findByProductId(productId);
 
         if (reviews.isEmpty()) {
             throw new ResourceNotFoundException("No reviews found for this product");
@@ -117,11 +121,11 @@ public class ReviewService {
 
     public String deleteReview(String email, Integer reviewId) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Customer not found"));
 
-        Entity review = reviewRepo.findById(reviewId)
+        ReviewEntity review = reviewRepo.findById(reviewId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Review not found"));
 

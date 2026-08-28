@@ -2,9 +2,9 @@ package RKTraders.web.Modules.Owner;
 
 import RKTraders.web.Modules.Customer.PasswordUpdateDTO;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
-import RKTraders.web.Modules.Product.Entity;
+import RKTraders.web.Modules.Product.ProductEntity;
 
-import RKTraders.web.Modules.Product.Repo;
+import RKTraders.web.Modules.Product.ProductRepo;
 import RKTraders.web.Modules.Security.JwtService;
 import RKTraders.web.Modules.Product.ProductStatus;
 import jakarta.annotation.PostConstruct;
@@ -22,7 +22,7 @@ public class OwnerService {
     private JwtService jwtService;
 
     @Autowired
-    private RKTraders.web.Modules.Owner.Repo ownerRepo;
+    private OwnerRepo ownerRepo;
 
     @Autowired
     private BCryptPasswordEncoder encoder;
@@ -42,7 +42,7 @@ public class OwnerService {
     public void CreateDefaultOwner() {
 
         if (ownerRepo.count() == 0) {
-            RKTraders.web.Modules.Owner.Entity owner = new RKTraders.web.Modules.Owner.Entity();
+            OwnerEntity owner = new OwnerEntity();
             owner.setOwnerName(ownerName);
             owner.setOwnerEmail(ownerEmail);
             owner.setOwnerPassword((encoder.encode(ownerPassword)));
@@ -55,7 +55,7 @@ public class OwnerService {
 
     public String loginOwner(OwnerLoginDTO loginRequest) {
 
-        Optional<RKTraders.web.Modules.Owner.Entity> owner =
+        Optional<OwnerEntity> owner =
                 ownerRepo.findByOwnerEmail(loginRequest.getOwnerEmail());
 
         System.out.println("Owner Found : " + owner.isPresent());
@@ -64,7 +64,7 @@ public class OwnerService {
             return "Owner Not Found";
         }
 
-        RKTraders.web.Modules.Owner.Entity existingOwner = owner.get();
+        OwnerEntity existingOwner = owner.get();
 
         System.out.println("DB Password : " + existingOwner.getOwnerPassword());
 
@@ -85,21 +85,21 @@ public class OwnerService {
     }
 
 
-    public RKTraders.web.Modules.Owner.Entity getProfile(String email) {
+    public OwnerEntity getProfile(String email) {
 
         return ownerRepo.findByOwnerEmail(email).orElse(null);
 
     }
 
-    public RKTraders.web.Modules.Owner.Entity updateProfile(String email, RKTraders.web.Modules.Owner.Entity updatedOwner) {
+    public OwnerEntity updateProfile(String email, OwnerEntity updatedOwner) {
 
-        Optional<RKTraders.web.Modules.Owner.Entity> owner = ownerRepo.findByOwnerEmail(email);
+        Optional<OwnerEntity> owner = ownerRepo.findByOwnerEmail(email);
 
         if (owner.isEmpty()) {
             return null;
         }
 
-        RKTraders.web.Modules.Owner.Entity existingOwner = owner.get();
+        OwnerEntity existingOwner = owner.get();
 
         existingOwner.setOwnerName(updatedOwner.getOwnerName());
         existingOwner.setOwnerEmail(updatedOwner.getOwnerEmail());
@@ -114,13 +114,13 @@ public class OwnerService {
     public String updatePassword(String email,
                                  PasswordUpdateDTO request) {
 
-        Optional<RKTraders.web.Modules.Owner.Entity> owner = ownerRepo.findByOwnerEmail(email);
+        Optional<OwnerEntity> owner = ownerRepo.findByOwnerEmail(email);
 
         if (owner.isEmpty()) {
             return "Owner Not Found";
         }
 
-        RKTraders.web.Modules.Owner.Entity existingOwner = owner.get();
+        OwnerEntity existingOwner = owner.get();
 
         if (!encoder.matches(request.getOldPassword(),
                 existingOwner.getOwnerPassword())) {
@@ -141,13 +141,13 @@ public class OwnerService {
     public String updateMobile(String email,
                                String mobileNo) {
 
-        Optional<RKTraders.web.Modules.Owner.Entity> owner = ownerRepo.findByOwnerEmail(email);
+        Optional<OwnerEntity> owner = ownerRepo.findByOwnerEmail(email);
 
         if (owner.isEmpty()) {
             return "Owner Not Found";
         }
 
-        RKTraders.web.Modules.Owner.Entity existingOwner = owner.get();
+        OwnerEntity existingOwner = owner.get();
 
         existingOwner.setOwnerMobileNo(mobileNo);
 
@@ -158,10 +158,10 @@ public class OwnerService {
     }
 
     @Autowired
-    Repo productRepo;
+    ProductRepo productRepo;
 
     public String changeProductStatus(int productId, ProductStatus status) {
-        Entity product = productRepo.findById(productId)
+        ProductEntity product = productRepo.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         product.setStatus(status);
 

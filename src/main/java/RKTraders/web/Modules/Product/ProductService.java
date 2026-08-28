@@ -2,6 +2,8 @@ package RKTraders.web.Modules.Product;
 
 import RKTraders.web.Exceptions.BadRequestException;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
+import RKTraders.web.Modules.Category.CategoryEntity;
+import RKTraders.web.Modules.Category.CategoryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -13,13 +15,13 @@ import java.util.Optional;
 @Service
 public class ProductService {
         @Autowired
-        Repo productRepo;
+        ProductRepo productRepo;
         CategoryRepo categoryRepo;
 
 
 
-        public List<Entity> addProducts(List<Entity> products) {
-            for (Entity product : products) {
+        public List<ProductEntity> addProducts(List<ProductEntity> products) {
+            for (ProductEntity product : products) {
                 product.setCreatedAt(LocalDateTime.now());
                 product.setUpdatedAt(LocalDateTime.now());
             }
@@ -29,19 +31,19 @@ public class ProductService {
 
 
 
-        public List<Entity> getAllProducts() {
+        public List<ProductEntity> getAllProducts() {
             return productRepo.findAll();
         }
 
 
-        public Entity getProductById(int id) {
+        public ProductEntity getProductById(int id) {
             return productRepo.findById(id).orElse(null);
         }
 
 
-        public Entity updateProduct(int id, Entity product) {
+        public ProductEntity updateProduct(int id, ProductEntity product) {
 
-            Entity existing = productRepo.findById(id).orElse(null);
+            ProductEntity existing = productRepo.findById(id).orElse(null);
 
             if(existing != null){
 
@@ -63,9 +65,9 @@ public class ProductService {
 
 
 
-    public List<Entity> getProductsByCategory(int categoryId) {
+    public List<ProductEntity> getProductsByCategory(int categoryId) {
 
-        Optional<Category> category =
+        Optional<CategoryEntity> category =
                 categoryRepo.findById(categoryId);
 
         if (category.isEmpty()) {
@@ -78,7 +80,7 @@ public class ProductService {
 
     public long totalProductsInCategory(int categoryId) {
 
-        Optional<Category> category = categoryRepo.findById(categoryId);
+        Optional<CategoryEntity> category = categoryRepo.findById(categoryId);
 
         if (category.isEmpty()) {
             throw new ResourceNotFoundException("Category Not Found");
@@ -96,9 +98,9 @@ public class ProductService {
 
         }
 
-    public List<Entity> searchProducts(String name) {
+    public List<ProductEntity> searchProducts(String name) {
 
-        List<Entity> products = productRepo.findByNameContainingIgnoreCase(name);
+        List<ProductEntity> products = productRepo.findByNameContainingIgnoreCase(name);
 
         if (products.isEmpty()) {
             throw new ResourceNotFoundException("No Product Found");
@@ -107,9 +109,9 @@ public class ProductService {
         return products;
     }
 
-    public List<Entity> getProductsByBrand(String brand) {
+    public List<ProductEntity> getProductsByBrand(String brand) {
 
-        List<Entity> products = productRepo.findByBrandIgnoreCase(brand);
+        List<ProductEntity> products = productRepo.findByBrandIgnoreCase(brand);
 
         if (products.isEmpty()) {
             throw new ResourceNotFoundException("No Products Found For This Brand");
@@ -118,10 +120,10 @@ public class ProductService {
         return products;
     }
 
-    public List<Entity> getProductsByPriceRange(double minPrice,
-                                                double maxPrice) {
+    public List<ProductEntity> getProductsByPriceRange(double minPrice,
+                                                       double maxPrice) {
 
-        List<Entity> products =
+        List<ProductEntity> products =
                 productRepo.findByPriceBetween(minPrice, maxPrice);
 
         if (products.isEmpty()) {
@@ -131,9 +133,9 @@ public class ProductService {
         return products;
     }
 
-    public List<Entity> getOutOfStockProducts() {
+    public List<ProductEntity> getOutOfStockProducts() {
 
-        List<Entity> products = productRepo.findByStock(0);
+        List<ProductEntity> products = productRepo.findByStock(0);
 
         if (products.isEmpty()) {
             throw new BadRequestException("No Out Of Stock Products");
@@ -142,28 +144,28 @@ public class ProductService {
         return products;
     }
 
-    public List<Entity> sortByPriceAscending() {
+    public List<ProductEntity> sortByPriceAscending() {
 
         return productRepo.findAll(
                 Sort.by(Sort.Direction.ASC, "price")
         );
     }
 
-    public List<Entity> sortByPriceDescending() {
+    public List<ProductEntity> sortByPriceDescending() {
 
         return productRepo.findAll(
                 Sort.by(Sort.Direction.DESC, "price")
         );
     }
 
-    public List<Entity> sortByName() {
+    public List<ProductEntity> sortByName() {
 
         return productRepo.findAll(
                 Sort.by("name")
         );
     }
 
-    public List<Entity> latestProducts() {
+    public List<ProductEntity> latestProducts() {
 
         return productRepo.findAll(
                 Sort.by(Sort.Direction.DESC, "createdAt")

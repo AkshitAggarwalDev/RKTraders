@@ -10,29 +10,29 @@ import java.util.List;
 public class EnquiryService {
 
     @Autowired
-    Repo enquiryRepo;
+    EnquiryRepo enquiryRepo;
 
-    public Entity addEnquiry(Entity enquiry){
+    public EnquiryEntity addEnquiry(EnquiryEntity enquiry){
 
         return enquiryRepo.save(enquiry);
 
     }
 
-    public List<Entity> getAllEnquiries(){
+    public List<EnquiryEntity> getAllEnquiries(){
 
         return enquiryRepo.findAll();
 
     }
 
-    public Entity getEnquiryById(int id){
+    public EnquiryEntity getEnquiryById(int id){
 
         return enquiryRepo.findById(id).orElse(null);
 
     }
 
-    public Entity updateEnquiry(int id, Entity enquiry){
+    public EnquiryEntity updateEnquiry(int id, EnquiryEntity enquiry){
 
-        Entity existingEnquiry = enquiryRepo.findById(id).orElse(null);
+        EnquiryEntity existingEnquiry = enquiryRepo.findById(id).orElse(null);
 
         if(existingEnquiry != null){
 

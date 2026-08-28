@@ -1,5 +1,6 @@
-package RKTraders.web.Modules.Product;
+package RKTraders.web.Modules.Enquiry;
 
+import RKTraders.web.Modules.Product.ProductEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,17 +10,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Entity
-public class ProductImageEntity {
+public class EnquiryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String imageUrl;
+    private String customerName;
 
-    private boolean primaryImage;
+    private String email;
+
+    private String phone;
+
+    private String message;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
     private ProductEntity product;
 }

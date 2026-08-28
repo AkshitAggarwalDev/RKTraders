@@ -4,7 +4,12 @@ import RKTraders.web.Exceptions.BadRequestException;
 import RKTraders.web.Exceptions.ForbiddenException;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Exceptions.UnauthorizedException;
+import RKTraders.web.Modules.Address.AddressEntity;
+import RKTraders.web.Modules.Address.AddressRepo;
 import RKTraders.web.Modules.Cart.*;
+import RKTraders.web.Modules.Customer.CustomerEntity;
+import RKTraders.web.Modules.Customer.CustomerRepo;
+import RKTraders.web.Modules.Order.OrderEntity;
 import RKTraders.web.Modules.Order.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,29 +20,29 @@ import java.util.List;
 @Service
 public class PaymentService {
     @Autowired
-    RKTraders.web.Modules.Customer.Repo customerRepo;
+    CustomerRepo customerRepo;
     @Autowired
-    RKTraders.web.Modules.Address.Repo addressRepo;
+    AddressRepo addressRepo;
     @Autowired
-    RKTraders.web.Modules.Cart.Repo cartRepo;
+    CartRepo cartRepo;
     @Autowired
-    Repo paymentRepo;
+    PaymentRepo paymentRepo;
     @Autowired
     CartItemRepo cartItemRepo;
 
-    public Entity initiatePayment(Integer addressId, String email) {
+    public PaymentEntity initiatePayment(Integer addressId, String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        RKTraders.web.Modules.Address.Entity address = addressRepo.findById(addressId)
+        AddressEntity address = addressRepo.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
             throw new ForbiddenException("This address does not belong to the logged-in customer");
         }
 
-        RKTraders.web.Modules.Cart.Entity cart = cartRepo.findByCustomerId(customer.getId())
+        CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItemEntity> cartItems = cartItemRepo.findByCartId(cart.getId());
@@ -50,7 +55,7 @@ public class PaymentService {
                 .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
                 .sum();
 
-        Entity payment = new Entity();
+        PaymentEntity payment = new PaymentEntity();
 
         payment.setAmount(totalAmount);
         payment.setPaymentMethod(PaymentMethodEnum.UPI);
@@ -66,12 +71,12 @@ public class PaymentService {
 CartService cartService;
     @Autowired
     OrderService orderService;
-    public Entity verifyPayment(String paymentId, String transactionId, String email) {
+    public PaymentEntity verifyPayment(String paymentId, String transactionId, String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity payment = paymentRepo.findByPaymentId(paymentId)
+        PaymentEntity payment = paymentRepo.findByPaymentId(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
         if (payment.getCustomer().getId() != customer.getId()) {
@@ -92,27 +97,27 @@ CartService cartService;
 
         paymentRepo.save(payment);
 
-        RKTraders.web.Modules.Order.Entity order = orderService.placeOrder(email);
+        OrderEntity order = orderService.placeOrder(email);
 
         payment.setOrder(order);
 
         return paymentRepo.save(payment);
     }
 
-    public List<Entity> getMyPayments(String email) {
+    public List<PaymentEntity> getMyPayments(String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         return paymentRepo.findByCustomer(customer);
     }
 
-    public Entity getPaymentById(String paymentId, String email) {
+    public PaymentEntity getPaymentById(String paymentId, String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity payment = paymentRepo.findByPaymentId(paymentId)
+        PaymentEntity payment = paymentRepo.findByPaymentId(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
         if (payment.getCustomer().getId() != customer.getId()) {
@@ -122,13 +127,13 @@ CartService cartService;
         return payment;
     }
 
-    public List<Entity> getAllPayments() {
+    public List<PaymentEntity> getAllPayments() {
 
         return paymentRepo.findAll();
 
     }
 
-    public List<Entity> getPaymentsByStatus(PaymentStatusEnum paymentStatus) {
+    public List<PaymentEntity> getPaymentsByStatus(PaymentStatusEnum paymentStatus) {
 
         return paymentRepo.findByPaymentStatus(paymentStatus);
 
@@ -136,11 +141,11 @@ CartService cartService;
 
     public Double getTotalRevenue() {
 
-        List<Entity> payments =
+        List<PaymentEntity> payments =
                 paymentRepo.findByPaymentStatus(PaymentStatusEnum.SUCCESS);
 
         double totalRevenue = payments.stream()
-                .mapToDouble(Entity::getAmount)
+                .mapToDouble(PaymentEntity::getAmount)
                 .sum();
 
         return totalRevenue;

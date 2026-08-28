@@ -2,7 +2,7 @@ package RKTraders.web.Modules.Category;
 
 import RKTraders.web.Exceptions.DuplicateResourceException;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
-import RKTraders.web.Modules.Product.Repo;
+import RKTraders.web.Modules.Product.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +12,11 @@ import java.util.Optional;
 public class CategoryService {
 
     @Autowired
-    RKTraders.web.Modules.Category.Repo categoryRepo;
-    Entity category;
-    Repo productRepo;
+    CategoryRepo categoryRepo;
+    CategoryEntity category;
+    ProductRepo productRepo;
 
-    public Entity addCategory(Entity category) {
+    public CategoryEntity addCategory(CategoryEntity category) {
 
         if (categoryRepo.existsByName(category.getName())) {
             return null;
@@ -25,15 +25,15 @@ public class CategoryService {
         return categoryRepo.save(category);
     }
 
-    public Entity getCategoryById(int id){
+    public CategoryEntity getCategoryById(int id){
 
         return categoryRepo.findById(id).orElse(null);
 
     }
 
-    public Entity updateCategory(int id, Entity category){
+    public CategoryEntity updateCategory(int id, CategoryEntity category){
 
-        Optional<Entity> existing =
+        Optional<CategoryEntity> existing =
                 categoryRepo.findByName(category.getName());
 
         if (existing.isPresent() &&
@@ -42,7 +42,7 @@ public class CategoryService {
             throw new DuplicateResourceException("Category Already Exists");
         }
 
-        Entity existingCategory = categoryRepo.findById(id).orElse(null);
+        CategoryEntity existingCategory = categoryRepo.findById(id).orElse(null);
 
         if(existingCategory != null){
 
@@ -59,7 +59,7 @@ public class CategoryService {
 
     public String deleteCategory(int id) {
 
-        Optional<Entity> category = categoryRepo.findById(id);
+        Optional<CategoryEntity> category = categoryRepo.findById(id);
 
         if (category.isEmpty()) {
             return "Category Not Found";
@@ -77,9 +77,9 @@ public class CategoryService {
     }
 
 
-    public Entity searchCategory(String name) {
+    public CategoryEntity searchCategory(String name) {
 
-        Optional<Entity> category =
+        Optional<CategoryEntity> category =
                 categoryRepo.findByNameIgnoreCase(name);
 
         if (category.isEmpty()) {

@@ -24,7 +24,7 @@ public class ProductImageService {
         ProductImageRepo productImageRepo;
 
         @Autowired
-        Repo productRepo;
+        ProductRepo productRepo;
 
 
 
@@ -33,7 +33,7 @@ public class ProductImageService {
 
         public String uploadImage(int productId, MultipartFile image) throws IOException {
 
-            Entity product = productRepo.findById(productId)
+            ProductEntity product = productRepo.findById(productId)
                     .orElseThrow(() -> new ResourceNotFoundException("Product Not Found"));
 
             String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
@@ -59,7 +59,7 @@ public class ProductImageService {
 
     public List<ProductImageEntity> getImagesByProductId(int productId) {
 
-        Entity product = productRepo.findById(productId)
+        ProductEntity product = productRepo.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         List<ProductImageEntity> images = productImageRepo.findByProductId(productId);

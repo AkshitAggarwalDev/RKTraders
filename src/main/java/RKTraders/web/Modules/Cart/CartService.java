@@ -3,6 +3,10 @@ package RKTraders.web.Modules.Cart;
 import RKTraders.web.Exceptions.BadRequestException;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Exceptions.UnauthorizedException;
+import RKTraders.web.Modules.Customer.CustomerEntity;
+import RKTraders.web.Modules.Customer.CustomerRepo;
+import RKTraders.web.Modules.Product.ProductEntity;
+import RKTraders.web.Modules.Product.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,35 +18,35 @@ public class CartService {
 
 
     @Autowired
-    private Repo cartRepo;
+    private CartRepo cartRepo;
 
     @Autowired
     private CartItemRepo cartItemRepo;
 
     @Autowired
-    private RKTraders.web.Modules.Customer.Repo customerRepo;
+    private CustomerRepo customerRepo;
 
     @Autowired
-    private RKTraders.web.Modules.Product.Repo productRepo;
+    private ProductRepo productRepo;
 
 
     public String addToCart(String email, int productId, int quantity) {
         System.out.println("Inside Add To Cart Service");
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        RKTraders.web.Modules.Product.Entity product = productRepo.findById(productId)
+        ProductEntity product = productRepo.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         if (product.getStock() < quantity) {
             throw new RuntimeException("Insufficient stock available");
         }
 
-        Entity cart = cartRepo.findByCustomerId(customer.getId())
+        CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseGet(() -> {
 
-                    Entity newCart = new Entity();
+                    CartEntity newCart = new CartEntity();
 
                     newCart.setCustomer(customer);
 
@@ -84,10 +88,10 @@ public class CartService {
 
     public List<CartItemEntity> viewCart(String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity cart = cartRepo.findByCustomerId(customer.getId())
+        CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItemEntity> cartItems = cartItemRepo.findByCartId(cart.getId());
@@ -102,10 +106,10 @@ public class CartService {
 
     public String updateQuantity(String email, int cartItemId, int quantity) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity cart = cartRepo.findByCustomerId(customer.getId())
+        CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         CartItemEntity cartItem = cartItemRepo.findById(cartItemId)
@@ -132,10 +136,10 @@ public class CartService {
 
     public String removeItem(String email, int cartItemId) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity cart = cartRepo.findByCustomerId(customer.getId())
+        CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         CartItemEntity cartItem = cartItemRepo.findById(cartItemId)
@@ -152,10 +156,10 @@ public class CartService {
 
     public String clearCart(String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity cart = cartRepo.findByCustomerId(customer.getId())
+        CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItemEntity> cartItems = cartItemRepo.findByCartId(cart.getId());
@@ -171,10 +175,10 @@ public class CartService {
 
     public double cartTotal(String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity cart = cartRepo.findByCustomerId(customer.getId())
+        CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         List<CartItemEntity> cartItems = cartItemRepo.findByCartId(cart.getId());

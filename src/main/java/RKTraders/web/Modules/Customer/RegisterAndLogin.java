@@ -14,7 +14,7 @@ public class RegisterAndLogin {
     CustomerService customerService;
 
     @PostMapping("register")
-    public Entity register(@RequestBody RegisterRequestDTO request) {
+    public CustomerEntity register(@RequestBody RegisterRequestDTO request) {
         return customerService.registerUser(request);
     }
 

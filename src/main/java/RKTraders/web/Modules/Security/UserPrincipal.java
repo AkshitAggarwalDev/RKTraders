@@ -1,6 +1,8 @@
     package RKTraders.web.Modules.Security;
 
-    import RKTraders.web.Modules.Admin.Entity;
+    import RKTraders.web.Modules.Admin.AdminEntity;
+    import RKTraders.web.Modules.Customer.CustomerEntity;
+    import RKTraders.web.Modules.Owner.OwnerEntity;
     import org.springframework.security.core.GrantedAuthority;
     import org.springframework.security.core.authority.SimpleGrantedAuthority;
     import org.springframework.security.core.userdetails.UserDetails;
@@ -14,18 +16,18 @@
         private String password;
         private String role;
 
-        public UserPrincipal(RKTraders.web.Modules.Customer.Entity customer) {
+        public UserPrincipal(CustomerEntity customer) {
             this.email = customer.getEmail();
             this.password = customer.getPassword();
             this.role = customer.getRole();
         }
 
-        public UserPrincipal(Entity admin) {
+        public UserPrincipal(AdminEntity admin) {
             this.password = admin.getAdminPassword();
             this.role = admin.getRole();
         }
 
-        public UserPrincipal(RKTraders.web.Modules.Owner.Entity owner) {
+        public UserPrincipal(OwnerEntity owner) {
             this.email = owner.getOwnerEmail();
             this.password = owner.getOwnerPassword();
             this.role = owner.getRole();

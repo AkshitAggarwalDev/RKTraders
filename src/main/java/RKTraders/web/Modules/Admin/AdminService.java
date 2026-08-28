@@ -10,33 +10,33 @@ import java.util.Optional;
 public class AdminService {
 
     @Autowired
-    private Repo adminRepo;
+    private AdminRepo adminRepo;
 
 
-    public List<Entity> addAdmin(List<Entity> admins) {
-        Entity user = new Entity();
+    public List<AdminEntity> addAdmin(List<AdminEntity> admins) {
+        AdminEntity user = new AdminEntity();
         user.setRole("Admin");
         return adminRepo.saveAll(admins);
     }
 
 
-    public List<Entity> getAllAdmins() {
+    public List<AdminEntity> getAllAdmins() {
         return adminRepo.findAll();
     }
 
 
-    public Optional<Entity> getAdminById(int id) {
+    public Optional<AdminEntity> getAdminById(int id) {
         return adminRepo.findById(id);
     }
 
 
-    public Optional<Entity> updateAdminById(int id, Entity updatedAdmin) {
+    public Optional<AdminEntity> updateAdminById(int id, AdminEntity updatedAdmin) {
 
-        Optional<Entity> optionalAdmin = adminRepo.findById(id);
+        Optional<AdminEntity> optionalAdmin = adminRepo.findById(id);
 
         if (optionalAdmin.isPresent()) {
 
-            Entity existingAdmin = optionalAdmin.get();
+            AdminEntity existingAdmin = optionalAdmin.get();
 
             existingAdmin.setAdminName(updatedAdmin.getAdminName());
             existingAdmin.setAdminAge(updatedAdmin.getAdminAge());

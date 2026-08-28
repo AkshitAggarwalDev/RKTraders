@@ -2,6 +2,8 @@ package RKTraders.web.Modules.Address;
 
 import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Exceptions.UnauthorizedException;
+import RKTraders.web.Modules.Customer.CustomerEntity;
+import RKTraders.web.Modules.Customer.CustomerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +14,14 @@ import java.util.Optional;
     public class AddressService {
 
         @Autowired
-        private Repo addressRepo;
+        private AddressRepo addressRepo;
 
         @Autowired
-        private RKTraders.web.Modules.Customer.Repo customerRepo;
+        private CustomerRepo customerRepo;
 
-        public Entity addAddress(Entity address, String email) {
+        public AddressEntity addAddress(AddressEntity address, String email) {
 
-            RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+            CustomerEntity customer = customerRepo.findByEmail(email)
                     .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
             address.setCustomer(customer);
@@ -30,12 +32,12 @@ import java.util.Optional;
 
             if (address.getDefaultAddress()) {
 
-                Optional<Entity> defaultAddress =
+                Optional<AddressEntity> defaultAddress =
                         addressRepo.findByCustomerAndDefaultAddressTrue(customer);
 
                 if (defaultAddress.isPresent()) {
 
-                    Entity oldDefault = defaultAddress.get();
+                    AddressEntity oldDefault = defaultAddress.get();
 
                     oldDefault.setDefaultAddress(false);
 
@@ -49,21 +51,21 @@ import java.util.Optional;
 
         }
 
-    public List<Entity> getMyAddresses(String email) {
+    public List<AddressEntity> getMyAddresses(String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         return addressRepo.findByCustomer(customer);
 
     }
 
-    public Entity getAddressById(Integer addressId, String email) {
+    public AddressEntity getAddressById(Integer addressId, String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity address = addressRepo.findById(addressId)
+        AddressEntity address = addressRepo.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
@@ -74,14 +76,14 @@ import java.util.Optional;
 
     }
 
-    public Entity updateAddress(Integer addressId,
-                                Entity updatedAddress,
-                                String email) {
+    public AddressEntity updateAddress(Integer addressId,
+                                       AddressEntity updatedAddress,
+                                       String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity address = addressRepo.findById(addressId)
+        AddressEntity address = addressRepo.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
@@ -105,10 +107,10 @@ import java.util.Optional;
 
     public String deleteAddress(Integer addressId, String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity address = addressRepo.findById(addressId)
+        AddressEntity address = addressRepo.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
@@ -121,21 +123,21 @@ import java.util.Optional;
 
     }
 
-    public Entity setDefaultAddress(Integer addressId, String email) {
+    public AddressEntity setDefaultAddress(Integer addressId, String email) {
 
-        RKTraders.web.Modules.Customer.Entity customer = customerRepo.findByEmail(email)
+        CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        Entity address = addressRepo.findById(addressId)
+        AddressEntity address = addressRepo.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
         if (address.getCustomer().getId() != customer.getId()) {
             throw new UnauthorizedException("Unauthorized");
         }
 
-        List<Entity> addresses = addressRepo.findByCustomer(customer);
+        List<AddressEntity> addresses = addressRepo.findByCustomer(customer);
 
-        for (Entity a : addresses) {
+        for (AddressEntity a : addresses) {
 
             a.setDefaultAddress(false);
 

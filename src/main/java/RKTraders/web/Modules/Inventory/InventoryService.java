@@ -2,8 +2,8 @@ package RKTraders.web.Modules.Inventory;
 import RKTraders.web.Modules.Owner.InventoryDTO;
 import RKTraders.web.Exceptions.BadRequestException;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
-import RKTraders.web.Modules.Product.Entity;
-import RKTraders.web.Modules.Product.Repo;
+import RKTraders.web.Modules.Product.ProductEntity;
+import RKTraders.web.Modules.Product.ProductRepo;
 import RKTraders.web.Modules.Product.ProductStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +14,11 @@ import java.util.List;
     public class InventoryService {
 
         @Autowired
-        private Repo productRepo;
+        private ProductRepo productRepo;
 
-        public List<Entity> getAllInventory() {
+        public List<ProductEntity> getAllInventory() {
 
-            List<Entity> products = productRepo.findAll();
+            List<ProductEntity> products = productRepo.findAll();
 
             if (products.isEmpty()) {
                 throw new ResourceNotFoundException("No products found in inventory");
@@ -28,9 +28,9 @@ import java.util.List;
         }
 
 
-        public Entity getInventoryByProductId(Integer productId) {
+        public ProductEntity getInventoryByProductId(Integer productId) {
 
-            Entity product = productRepo.findById(productId)
+            ProductEntity product = productRepo.findById(productId)
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Product not found"));
 
@@ -38,9 +38,9 @@ import java.util.List;
         }
 
 
-        public Entity updateStock(Integer productId, Integer stock) {
+        public ProductEntity updateStock(Integer productId, Integer stock) {
 
-            Entity product = productRepo.findById(productId)
+            ProductEntity product = productRepo.findById(productId)
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Product not found"));
 
@@ -60,9 +60,9 @@ import java.util.List;
         }
 
         // Add Stock
-        public Entity addStock(Integer productId, Integer quantity) {
+        public ProductEntity addStock(Integer productId, Integer quantity) {
 
-            Entity product = productRepo.findById(productId)
+            ProductEntity product = productRepo.findById(productId)
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Product not found"));
 
@@ -80,9 +80,9 @@ import java.util.List;
         }
 
         // Remove Stock
-        public Entity removeStock(Integer productId, Integer quantity) {
+        public ProductEntity removeStock(Integer productId, Integer quantity) {
 
-            Entity product = productRepo.findById(productId)
+            ProductEntity product = productRepo.findById(productId)
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Product not found"));
 
@@ -104,9 +104,9 @@ import java.util.List;
         }
 
         // Get Low Stock Products
-        public List<Entity> getLowStockProducts() {
+        public List<ProductEntity> getLowStockProducts() {
 
-            List<Entity> products = productRepo.findByStockLessThanEqual(10);
+            List<ProductEntity> products = productRepo.findByStockLessThanEqual(10);
 
             if (products.isEmpty()) {
                 throw new ResourceNotFoundException("No low stock products found");
@@ -116,9 +116,9 @@ import java.util.List;
         }
 
         // Get Out Of Stock Products
-        public List<Entity> getOutOfStockProducts() {
+        public List<ProductEntity> getOutOfStockProducts() {
 
-            List<Entity> products = productRepo.findByStock(0);
+            List<ProductEntity> products = productRepo.findByStock(0);
 
             if (products.isEmpty()) {
                 throw new ResourceNotFoundException("No out of stock products found");
@@ -130,7 +130,7 @@ import java.util.List;
         // Inventory Summary
         public InventoryDTO getInventorySummary() {
 
-            List<Entity> products = productRepo.findAll();
+            List<ProductEntity> products = productRepo.findAll();
 
             InventoryDTO summary = new InventoryDTO();
 

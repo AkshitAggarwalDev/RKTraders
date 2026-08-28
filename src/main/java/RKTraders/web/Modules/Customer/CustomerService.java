@@ -17,7 +17,7 @@ import java.util.Optional;
 public class CustomerService implements UserDetailsService {
 
     @Autowired
-    private Repo customerRepo;
+    private CustomerRepo customerRepo;
 
     @Autowired
     private JwtService jwtService;
@@ -32,7 +32,7 @@ public class CustomerService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        Optional<Entity> user = customerRepo.findByEmail(username);
+        Optional<CustomerEntity> user = customerRepo.findByEmail(username);
 
         if(user.isEmpty()){
             throw new ResourceNotFoundException("User Not Found");
@@ -44,9 +44,9 @@ public class CustomerService implements UserDetailsService {
 
 
 
-    public Entity registerUser(RegisterRequestDTO request){
+    public CustomerEntity registerUser(RegisterRequestDTO request){
 
-        Entity user = new Entity();
+        CustomerEntity user = new CustomerEntity();
 
         user.setName(request.getName());
         user.setEmail(request.getEmail());
@@ -62,13 +62,13 @@ public class CustomerService implements UserDetailsService {
 
     public String loginUser(LoginRequestDTO login){
 
-        Optional<Entity> user = customerRepo.findByEmail(login.getEmail());
+        Optional<CustomerEntity> user = customerRepo.findByEmail(login.getEmail());
 
         if(user.isEmpty()){
             return "Customer is not registered yet, Register yourself first ! ";
         }
 
-        Entity existingUser = user.get();
+        CustomerEntity existingUser = user.get();
 
         if(encoder.matches(login.getPassword(), existingUser.getPassword())){
 
@@ -79,8 +79,8 @@ public class CustomerService implements UserDetailsService {
         return "Invalid Password";
     }
 
-    public Entity getProfile(String email){
-        Optional<Entity> customer =
+    public CustomerEntity getProfile(String email){
+        Optional<CustomerEntity> customer =
                 customerRepo.findByEmail(email);
 
         if(customer.isEmpty()){
@@ -89,15 +89,15 @@ public class CustomerService implements UserDetailsService {
         return customer.get();
     }
 
-    public Entity updateProfile(String email, Entity updatedCustomer) {
+    public CustomerEntity updateProfile(String email, CustomerEntity updatedCustomer) {
 
-        Optional<Entity> customer = customerRepo.findByEmail(email);
+        Optional<CustomerEntity> customer = customerRepo.findByEmail(email);
 
         if (customer.isEmpty()) {
             return null;
         }
 
-        Entity existingCustomer = customer.get();
+        CustomerEntity existingCustomer = customer.get();
 
         existingCustomer.setName(updatedCustomer.getName());
         existingCustomer.setEmail(updatedCustomer.getEmail());
@@ -108,13 +108,13 @@ public class CustomerService implements UserDetailsService {
     public String updatePassword(String email,
                                  PasswordUpdateDTO request) {
 
-        Optional<Entity> customer = customerRepo.findByEmail(email);
+        Optional<CustomerEntity> customer = customerRepo.findByEmail(email);
 
         if(customer.isEmpty()){
             return "Customer Not Found";
         }
 
-        Entity existingCustomer = customer.get();
+        CustomerEntity existingCustomer = customer.get();
 
         if(!encoder.matches(request.getOldPassword(),
                 existingCustomer.getPassword())){
@@ -137,7 +137,7 @@ public class CustomerService implements UserDetailsService {
 
     public String deleteProfile(String email) {
 
-        Optional<Entity> customer = customerRepo.findByEmail(email);
+        Optional<CustomerEntity> customer = customerRepo.findByEmail(email);
 
         if (customer.isEmpty()) {
             return "Customer Not Found";
