@@ -1,11 +1,12 @@
 package RKTraders.web.Configs;
 
-import RKTraders.web.Filter.JwtFilter;
+import RKTraders.web.Modules.Security.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,6 +29,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
 
+                .cors(Customizer.withDefaults())
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
@@ -46,7 +49,10 @@ public class SecurityConfig {
                         .hasAnyRole("ADMIN", "OWNER")
 
                         .requestMatchers(HttpMethod.GET, "/products/**")
-                        .hasAnyRole("CUSTOMER", "ADMIN", "OWNER")
+                        .permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/product-images/**")
+                        .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/products/**")
                         .hasAnyRole("ADMIN", "OWNER")
@@ -63,6 +69,9 @@ public class SecurityConfig {
                         .requestMatchers("/category/**").permitAll()
 
                         .requestMatchers("/uploads/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/enquiries/addEnquiry")
+                        .permitAll()
                         .requestMatchers("/cart/**")
                         .hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.GET, "/orders/all")

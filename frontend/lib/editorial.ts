@@ -1,0 +1,17 @@
+export type EditorialSlide = { image: string; position: string; eyebrow: string; title: string; description: string; primaryLabel: string; primaryHref: string; secondaryLabel: string; secondaryHref: string; note: string };
+
+export const heroSlides: EditorialSlide[] = [
+  { image: "/images/hero-showroom.png", position: "63% center", eyebrow: "Objects with a lasting point of view", title: "Live in\nRemarkable.", description: "A cinematic collection of pieces made to become part of your everyday rituals.", primaryLabel: "Explore Collection", primaryHref: "/products", secondaryLabel: "View Lookbook", secondaryHref: "/lookbook", note: "Curated for\nyour space." },
+  { image: "/images/hero-dining.png", position: "center", eyebrow: "Designed for the way you live", title: "Make space for\nbetter living.", description: "Thoughtfully chosen furniture brings comfort, character and timeless form into the rooms you share.", primaryLabel: "Explore Dining", primaryHref: "/products?category=Dining", secondaryLabel: "View Lookbook", secondaryHref: "/lookbook", note: "Made for\nlong evenings." },
+  { image: "/images/hero-bedroom.png", position: "center", eyebrow: "Form meets function", title: "Designed\nto belong.", description: "Discover pieces created to feel effortless today and quietly timeless tomorrow.", primaryLabel: "Shop Collection", primaryHref: "/products", secondaryLabel: "View Lookbook", secondaryHref: "/lookbook", note: "A softer\npoint of view." },
+  { image: "/images/hero-workspace.png", position: "center", eyebrow: "Your space. Your statement.", title: "Create something\nremarkable.", description: "Curated furniture and home pieces for rooms with focus, personality and a life of their own.", primaryLabel: "Explore Collection", primaryHref: "/products", secondaryLabel: "View Lookbook", secondaryHref: "/lookbook", note: "A place\nto begin." },
+];
+
+export const lookbookScenes = [
+  { kicker: "The RK edit", title: "Rooms with a point of view.", description: "A visual study of furniture chosen for the way life is actually lived.", image: "/images/hero-showroom.png", position: "center", href: "/products", label: "Explore the collection" },
+  { kicker: "Living", title: "Where comfort becomes character.", description: "Thoughtfully selected pieces that make everyday spaces feel extraordinary.", image: "/images/hero-showroom.png", position: "center", href: "/products?category=Living", label: "Explore Living" },
+  { kicker: "Dining", title: "Gather around something memorable.", description: "Forms designed for long conversations, slow evenings and shared moments.", image: "/images/hero-dining.png", position: "center", href: "/products?category=Dining", label: "Explore Dining" },
+  { kicker: "Bedroom", title: "A gentler rhythm, beautifully made.", description: "Quiet materials and considered silhouettes for the rooms that restore you.", image: "/images/hero-bedroom.png", position: "center", href: "/products?category=Bedroom", label: "Explore Bedroom" },
+  { kicker: "Workspace", title: "Space to make your best work.", description: "A focused setting where function is every bit as thoughtful as form.", image: "/images/hero-workspace.png", position: "center", href: "/products", label: "Explore the collection" },
+  { kicker: "Decor", title: "The details change everything.", description: "A final layer of texture, warmth and personality for your own point of view.", image: "/images/hero-dining.png", position: "70% center", href: "/products?category=Decor", label: "Explore Decor" },
+];
