@@ -1,19 +1,24 @@
 package RKTraders.web.Modules.Product;
 
-
 import RKTraders.web.Modules.Cart.CartItemEntity;
+
+
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 @Data
-@EqualsAndHashCode(exclude = {"category", "cartItems", "images"})
-@ToString(exclude = {"category", "cartItems", "images"})
-@RKTraders.web.Modules.Customer.Entity
+@EqualsAndHashCode(exclude = {"category", "cartItems", "images", "reviews"})
+@ToString(exclude = {"category", "cartItems", "images", "reviews"})
+@jakarta.persistence.Entity
 public class Entity {
 
     @Id
@@ -45,14 +50,15 @@ public class Entity {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Category category;
+    private RKTraders.web.Modules.Category.Entity category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<RKTraders.web.Modules.Review.Entity> reviews;
-@CreationTimestamp
-    private LocalDateTime createdAt;
-@UpdateTimestamp
-    private LocalDateTime updatedAt;
 
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }
