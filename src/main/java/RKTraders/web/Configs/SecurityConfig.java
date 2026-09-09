@@ -74,7 +74,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/cart/**")
                         .hasRole("CUSTOMER")
-                        .requestMatchers(HttpMethod.GET, "/orders/all")
+                            .requestMatchers(HttpMethod.GET, "/orders/all")
                         .hasAnyRole("OWNER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/orders/count")
                         .hasAnyRole("OWNER", "ADMIN")

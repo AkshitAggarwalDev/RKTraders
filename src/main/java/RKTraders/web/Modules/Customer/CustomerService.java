@@ -42,8 +42,6 @@ public class CustomerService implements UserDetailsService {
     }
 
 
-
-
     public CustomerEntity registerUser(RegisterRequestDTO request){
 
         CustomerEntity user = new CustomerEntity();
