@@ -16,6 +16,8 @@ import java.util.Optional;
 public class ProductService {
         @Autowired
         ProductRepo productRepo;
+
+        @Autowired
         CategoryRepo categoryRepo;
 
 

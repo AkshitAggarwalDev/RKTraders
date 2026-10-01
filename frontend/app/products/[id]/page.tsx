@@ -6,14 +6,14 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { catalogApi } from "@/lib/api";
-import { fallbackProducts, money, type Product } from "@/lib/data";
+import { money, type Product } from "@/lib/data";
 import { useStore } from "@/context/store";
 
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const id = Number(params.id);
-  const [product, setProduct] = useState<Product | null>(() => fallbackProducts.find((item) => item.id === id) ?? null);
+  const id = typeof params.id === "string" ? Number(params.id) : Number.NaN;
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [message, setMessage] = useState("");
@@ -21,7 +21,9 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     let active = true;
-    if (!Number.isFinite(id)) { setLoading(false); return; }
+    if (!Number.isFinite(id)) return;
+    setLoading(true);
+    setProduct(null);
     void catalogApi.byId(id).then((item) => { if (active) setProduct(item); }).catch(() => undefined).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [id]);

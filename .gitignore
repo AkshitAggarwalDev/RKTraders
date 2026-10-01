@@ -39,6 +39,13 @@ frontend/.env
 frontend/.env.local
 frontend/tsconfig.tsbuildinfo
 
+### Local Tools ###
+.freebuff/
+.pnpm-store/
+
+### Backend Runtime Files ###
+uploads/
+
 ### Environment Variables ###
 .env
 .env.*

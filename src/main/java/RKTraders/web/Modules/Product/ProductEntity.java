@@ -20,6 +20,7 @@ import java.util.List;
 @EqualsAndHashCode(exclude = {"category", "cartItems", "images", "reviews"})
 @ToString(exclude = {"category", "cartItems", "images", "reviews"})
 @jakarta.persistence.Entity
+@Table(name = "product")
 public class ProductEntity {
 
     @Id

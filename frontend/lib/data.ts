@@ -27,4 +27,6 @@ export const collections = [
   { title: "Refined Bedroom", image: "/images/hero-showroom.png", position: "89% center" },
 ];
 
-export const money = (value: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value);
+export const money = (value: number) => Number.isFinite(value)
+  ? new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value)
+  : "Price unavailable";

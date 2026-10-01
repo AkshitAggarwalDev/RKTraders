@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Entity
+@Table(name = "category")
 public class CategoryEntity {
 
     @Id

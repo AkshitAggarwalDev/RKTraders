@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @jakarta.persistence.Entity
+@Table(name = "product_image")
 public class ProductImageEntity {
 
     @Id

@@ -39,7 +39,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     try { setCart(await cartApi.lines()); }
     catch (error) {
       const message = errorMessage(error);
-      if (!/cart is empty/i.test(message)) setNotice(message);
+      // A new customer may not have a cart record yet. Treat that response as
+      // an empty cart rather than showing an error immediately after sign-in.
+      if (!/cart (is empty|not found)/i.test(message)) setNotice(message);
       setCart([]);
     } finally { setLoadingCart(false); }
   }, [isAuthenticated]);
