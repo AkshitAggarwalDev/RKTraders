@@ -3,6 +3,8 @@ package RKTraders.web.Modules.Order;
 import RKTraders.web.Modules.Cart.CartEntity;
 import RKTraders.web.Modules.Cart.CartItemEntity;
 import RKTraders.web.Modules.Cart.CartItemRepo;
+import RKTraders.web.Modules.Address.AddressEntity;
+import RKTraders.web.Modules.Address.AddressRepo;
 import RKTraders.web.Exceptions.BadRequestException;
 import RKTraders.web.Exceptions.ResourceNotFoundException;
 import RKTraders.web.Modules.Cart.CartRepo;
@@ -45,13 +47,24 @@ public class OrderService {
     @Autowired
     ProductRepo productRepo;
 
+    @Autowired
+    AddressRepo addressRepo;
+
 
 
     @Transactional
-    public OrderEntity placeOrder(String email) {
+    public OrderEntity placeOrder(String email, Integer addressId) {
 
         CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+
+        AddressEntity address = addressRepo.findById(addressId)
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+
+        if (address.getCustomer().getId() != customer.getId()) {
+            throw new RKTraders.web.Exceptions.ForbiddenException(
+                    "This address does not belong to the logged-in customer");
+        }
 
         CartEntity cart = cartRepo.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
@@ -92,6 +105,7 @@ public class OrderService {
         // Create Order
         OrderEntity order = new OrderEntity();
         order.setCustomer(customer);
+        order.setAddress(address);
         order.setTotalAmount(totalAmount);
         order.setOrderStatus(OrderStatus.PLACED);
 
@@ -150,9 +164,18 @@ public class OrderService {
     }
 
 
-    public Optional<OrderEntity> getOrderById(Integer id){
-    return orderRepo.findById(id);
+    public OrderEntity getMyOrderById(Integer id, String email) {
+        CustomerEntity customer = customerRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
+        OrderEntity order = orderRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        if (order.getCustomer().getId() != customer.getId()) {
+            throw new RKTraders.web.Exceptions.ForbiddenException("This order does not belong to the logged-in customer");
+        }
+
+        return order;
     }
 
     @Transactional

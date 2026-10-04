@@ -19,9 +19,10 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping("place")
-    public OrderEntity placeOrder(Authentication authentication){
+    public OrderEntity placeOrder(Authentication authentication,
+                                  @RequestParam Integer addressId){
 
-        return orderService.placeOrder(authentication.getName());
+        return orderService.placeOrder(authentication.getName(), addressId);
 
     }
 
@@ -34,9 +35,11 @@ public class OrderController {
 
     }
 
-    @GetMapping("getOrderById")
-    public Optional<OrderEntity> GetOrdersById(Integer id){
-        return orderService.getOrderById(id);
+    @GetMapping("my/{orderId}")
+    public ResponseEntity<OrderEntity> getMyOrderById(
+            @PathVariable Integer orderId,
+            Authentication authentication) {
+        return ResponseEntity.ok(orderService.getMyOrderById(orderId, authentication.getName()));
     }
 
 

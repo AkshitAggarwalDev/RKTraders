@@ -1,6 +1,7 @@
 package RKTraders.web.Modules.Order;
 
 import RKTraders.web.Modules.Customer.CustomerEntity;
+import RKTraders.web.Modules.Address.AddressEntity;
 import RKTraders.web.Modules.Owner.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,11 @@ public class OrderEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private CustomerEntity customer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private AddressEntity address;
 
     @Column(nullable = false)
     private double totalAmount;

@@ -14,29 +14,6 @@ import java.util.List;
 
         private final PaymentService paymentService;
 
-        @PostMapping("/initiate/{addressId}")
-        public ResponseEntity<PaymentEntity> initiatePayment(@PathVariable Integer addressId,
-                                                             Authentication authentication) {
-
-            return ResponseEntity.ok(
-                    paymentService.initiatePayment(addressId, authentication.getName())
-            );
-        }
-
-
-        @PostMapping("/verify/{paymentId}")
-        public ResponseEntity<PaymentEntity> verifyPayment(@PathVariable String paymentId,
-                                                           @RequestParam String transactionId,
-                                                           Authentication authentication) {
-
-            return ResponseEntity.ok(
-                    paymentService.verifyPayment(paymentId,
-                            transactionId,
-                            authentication.getName())
-            );
-        }
-
-
         @GetMapping("/my")
         public ResponseEntity<List<PaymentEntity>> getMyPayments(Authentication authentication) {
 

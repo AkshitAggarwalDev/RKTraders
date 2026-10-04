@@ -39,7 +39,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/customer/register",
                                 "/customer/login",
-                                "/owner/settings/login"
+                                "/owner/settings/login",
+                                "/error"
                         ).permitAll()
 
                         .requestMatchers("/owner/**")
@@ -89,11 +90,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/orders/between-dates")
                         .hasAnyRole("OWNER", "ADMIN")
-                        .requestMatchers(
-                                "/payment/initiate/**",
-                                "/payment/verify/**",
-                                "/payment/my"
-                        )
+                        .requestMatchers("/payment/my")
                         .hasRole("CUSTOMER")
 
                         .requestMatchers(HttpMethod.GET,
