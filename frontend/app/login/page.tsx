@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authApi, errorMessage } from "@/lib/api";
 import { ApiError } from "@/lib/api/client";
 import { credentialsValidationMessage } from "@/lib/auth-validation";
 
+// `useSearchParams` requires a Suspense boundary during static prerender
+// (Next.js 15). The page body is unchanged; it is only wrapped.
 export default function LoginPage() {
+  return <Suspense><LoginForm /></Suspense>;
+}
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");

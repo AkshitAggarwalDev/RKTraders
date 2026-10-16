@@ -2,7 +2,6 @@ package RKTraders.web.Modules.Payment;
 
 public enum PaymentMethodEnum {
 
-
-        UPI
+        CASH_ON_DELIVERY
 
     }

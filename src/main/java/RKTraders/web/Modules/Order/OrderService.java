@@ -14,6 +14,8 @@ import RKTraders.web.Modules.Owner.OrderStatus;
 import RKTraders.web.Modules.Product.ProductEntity;
 import RKTraders.web.Modules.Product.ProductRepo;
 import RKTraders.web.Modules.Product.ProductStatus;
+import RKTraders.web.Modules.Payment.PaymentService;
+import RKTraders.web.Modules.Payment.PaymentRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -49,6 +51,12 @@ public class OrderService {
 
     @Autowired
     AddressRepo addressRepo;
+
+    @Autowired
+    PaymentService paymentService;
+
+    @Autowired
+    PaymentRepo paymentRepo;
 
 
 
@@ -132,6 +140,12 @@ public class OrderService {
         orderItemRepo.saveAll(orderItems);
 
         savedOrder.setOrderItems(orderItems);
+        paymentService.createPendingPayment(savedOrder, customer, address);
+        // Keep the managed entity in sync with the payment record that was
+        // just created so the place-order response is serialized correctly.
+        savedOrder.setPaymentStatus(paymentRepo.findByOrderId(savedOrder.getId())
+                .map(RKTraders.web.Modules.Payment.PaymentEntity::getPaymentStatus)
+                .orElse(RKTraders.web.Modules.Payment.PaymentStatusEnum.PENDING));
 
         // Update Product Stock
         for (CartItemEntity item : cartItems) {
@@ -149,18 +163,24 @@ public class OrderService {
         return savedOrder;
     }
 
+    @Transactional
+    public CustomerOrderResponse placeOrderResponse(String email, Integer addressId) {
+        return CustomerOrderResponse.from(placeOrder(email, addressId));
+    }
+
     public List<OrderEntity> getMyOrders(String email) {
 
         CustomerEntity customer = customerRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        List<OrderEntity> orders = orderRepo.findByCustomerId(customer.getId());
-
-        if (orders.isEmpty()) {
-            throw new ResourceNotFoundException("No Orders Found");
-        }
-
+        List<OrderEntity> orders = orderRepo.findByCustomerIdOrderByOrderDateDesc(customer.getId());
+        orders.forEach(this::attachPaymentStatus);
         return orders;
+    }
+
+    @Transactional
+    public List<CustomerOrderResponse> getMyOrderResponses(String email) {
+        return getMyOrders(email).stream().map(CustomerOrderResponse::from).toList();
     }
 
 
@@ -175,7 +195,17 @@ public class OrderService {
             throw new RKTraders.web.Exceptions.ForbiddenException("This order does not belong to the logged-in customer");
         }
 
+        attachPaymentStatus(order);
         return order;
+    }
+
+    @Transactional
+    public CustomerOrderResponse getMyOrderResponseById(Integer id, String email) {
+        return CustomerOrderResponse.from(getMyOrderById(id, email));
+    }
+
+    private void attachPaymentStatus(OrderEntity order) {
+        paymentRepo.findByOrderId(order.getId()).ifPresent(payment -> order.setPaymentStatus(payment.getPaymentStatus()));
     }
 
     @Transactional

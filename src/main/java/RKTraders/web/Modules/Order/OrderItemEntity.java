@@ -1,6 +1,7 @@
 package RKTraders.web.Modules.Order;
 
 import RKTraders.web.Modules.Product.ProductEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,10 +18,12 @@ public class OrderItemEntity {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private OrderEntity order;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private ProductEntity product;
 
     private String productName;

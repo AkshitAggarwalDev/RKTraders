@@ -82,6 +82,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/orders/my/count")
                         .hasRole("CUSTOMER")
                         .requestMatchers(
+                                "/orders/myOrders",
+                                "/orders/my/**",
+                                "/orders/place",
+                                "/orders/cancel/**"
+                        )
+                        .hasRole("CUSTOMER")
+                        .requestMatchers(
                                 HttpMethod.GET,
                                 "/orders/recent",
                                 "/orders/today"
@@ -90,6 +97,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/orders/between-dates")
                         .hasAnyRole("OWNER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/payment/order/**")
+                        .hasRole("CUSTOMER")
                         .requestMatchers("/payment/my")
                         .hasRole("CUSTOMER")
 

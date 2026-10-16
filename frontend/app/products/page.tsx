@@ -1,14 +1,20 @@
 "use client";
 
 import { Search, SlidersHorizontal } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Navigation } from "@/components/navigation";
 import { ProductCard } from "@/components/product-card";
 import { catalogApi } from "@/lib/api";
 import type { Product } from "@/lib/data";
 
+// `useSearchParams` requires a Suspense boundary during static prerender
+// (Next.js 15). The catalogue body is unchanged; it is only wrapped.
 export default function ProductsPage() {
+  return <Suspense><ProductsContent /></Suspense>;
+}
+
+function ProductsContent() {
   const searchParams = useSearchParams();
   const requestedCategory = searchParams.get("category") ?? "All";
   const sort = searchParams.get("sort");

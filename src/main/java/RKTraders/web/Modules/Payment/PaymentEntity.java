@@ -7,7 +7,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,6 +29,8 @@ import java.util.UUID;
         private Double amount;
 
         @Enumerated(EnumType.STRING)
+        @JdbcTypeCode(Types.VARCHAR)
+        @Column(name = "payment_method", length = 32)
         private PaymentMethodEnum paymentMethod;
 
         @Enumerated(EnumType.STRING)

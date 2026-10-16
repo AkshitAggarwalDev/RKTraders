@@ -19,27 +19,27 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping("place")
-    public OrderEntity placeOrder(Authentication authentication,
-                                  @RequestParam Integer addressId){
+    public CustomerOrderResponse placeOrder(Authentication authentication,
+                                             @RequestParam Integer addressId){
 
-        return orderService.placeOrder(authentication.getName(), addressId);
+        return orderService.placeOrderResponse(authentication.getName(), addressId);
 
     }
 
     @GetMapping("myOrders")
-    public ResponseEntity<List<OrderEntity>> getMyOrders(Authentication authentication) {
+    public ResponseEntity<List<CustomerOrderResponse>> getMyOrders(Authentication authentication) {
 
         return ResponseEntity.ok(
-                orderService.getMyOrders(authentication.getName())
+                orderService.getMyOrderResponses(authentication.getName())
         );
 
     }
 
     @GetMapping("my/{orderId}")
-    public ResponseEntity<OrderEntity> getMyOrderById(
+    public ResponseEntity<CustomerOrderResponse> getMyOrderById(
             @PathVariable Integer orderId,
             Authentication authentication) {
-        return ResponseEntity.ok(orderService.getMyOrderById(orderId, authentication.getName()));
+        return ResponseEntity.ok(orderService.getMyOrderResponseById(orderId, authentication.getName()));
     }
 
 

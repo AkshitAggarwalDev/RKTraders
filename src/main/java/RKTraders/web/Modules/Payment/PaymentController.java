@@ -22,6 +22,10 @@ import java.util.List;
             );
         }
 
+        @GetMapping("/order/{orderId}")
+        public ResponseEntity<PaymentEntity> getMyPaymentForOrder(@PathVariable int orderId, Authentication authentication) {
+            return ResponseEntity.ok(paymentService.getMyPaymentForOrder(orderId, authentication.getName()));
+        }
 
         @GetMapping("/{paymentId}")
         public ResponseEntity<PaymentEntity> getPaymentById(@PathVariable String paymentId,

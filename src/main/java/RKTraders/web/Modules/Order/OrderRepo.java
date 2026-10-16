@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
     public interface OrderRepo extends JpaRepository<OrderEntity, Integer> {
     List<OrderEntity> findAll();
-        List<OrderEntity> findByCustomerId(int customerId);
+        List<OrderEntity> findByCustomerIdOrderByOrderDateDesc(int customerId);
     List<OrderEntity> findByOrderStatus(OrderStatus orderStatus);
     long countByCustomer(CustomerEntity customer);
     List<OrderEntity> findTop10ByOrderByOrderDateDesc();

@@ -11,6 +11,8 @@ public interface PaymentRepo extends JpaRepository<PaymentEntity,Integer> {
 
     Optional<PaymentEntity> findByTransactionId(String transactionId);
 
+    Optional<PaymentEntity> findByOrderId(int orderId);
+
     List<PaymentEntity> findByCustomer(CustomerEntity customer);
 
     List<PaymentEntity> findByPaymentStatus(PaymentStatusEnum paymentStatus);

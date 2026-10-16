@@ -3,6 +3,8 @@ package RKTraders.web.Modules.Order;
 import RKTraders.web.Modules.Customer.CustomerEntity;
 import RKTraders.web.Modules.Address.AddressEntity;
 import RKTraders.web.Modules.Owner.OrderStatus;
+import RKTraders.web.Modules.Payment.PaymentStatusEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,12 +28,15 @@ public class OrderEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnore
     private CustomerEntity customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
-    @com.fasterxml.jackson.annotation.JsonIgnore
     private AddressEntity address;
+
+    @Transient
+    private PaymentStatusEnum paymentStatus;
 
     @Column(nullable = false)
     private double totalAmount;
