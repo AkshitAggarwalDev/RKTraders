@@ -76,7 +76,7 @@ public class ProductImageService {
         ProductImageEntity image = productImageRepo.findById(imageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found"));
 
-        Path path = Paths.get("uploads", image.getImageUrl());
+        Path path = Paths.get(uploadDir, image.getImageUrl());
 
         Files.deleteIfExists(path);
 
