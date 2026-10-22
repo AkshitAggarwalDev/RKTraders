@@ -35,7 +35,9 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI()
                 .substring(request.getContextPath().length());
-        return PUBLIC_AUTH_PATHS.contains(path);
+
+        return "OPTIONS".equalsIgnoreCase(request.getMethod())
+                || PUBLIC_AUTH_PATHS.contains(path);
     }
 
     @Override

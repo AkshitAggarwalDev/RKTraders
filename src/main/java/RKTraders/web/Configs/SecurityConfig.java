@@ -5,12 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -23,8 +28,36 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // CORS configuration for the deployed frontend
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(
+                List.of("https://rk-traders-two.vercel.app")
+        );
+
+        config.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+        );
+
+        config.setAllowedHeaders(
+                List.of("Authorization", "Content-Type", "Accept", "Origin")
+        );
+
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -32,7 +65,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
 
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
 
                 .authorizeHttpRequests(auth -> auth
 
@@ -67,20 +103,27 @@ public class SecurityConfig {
                         .requestMatchers("/customer/**")
                         .hasAnyRole("CUSTOMER", "OWNER")
 
-                        .requestMatchers("/category/**").permitAll()
+                        .requestMatchers("/category/**")
+                        .permitAll()
 
-                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/uploads/**")
+                        .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/enquiries/addEnquiry")
                         .permitAll()
+
                         .requestMatchers("/cart/**")
                         .hasRole("CUSTOMER")
-                            .requestMatchers(HttpMethod.GET, "/orders/all")
+
+                        .requestMatchers(HttpMethod.GET, "/orders/all")
                         .hasAnyRole("OWNER", "ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/orders/count")
                         .hasAnyRole("OWNER", "ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/orders/my/count")
                         .hasRole("CUSTOMER")
+
                         .requestMatchers(
                                 "/orders/myOrders",
                                 "/orders/my/**",
@@ -88,6 +131,7 @@ public class SecurityConfig {
                                 "/orders/cancel/**"
                         )
                         .hasRole("CUSTOMER")
+
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/orders/recent",
@@ -97,21 +141,20 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/orders/between-dates")
                         .hasAnyRole("OWNER", "ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/payment/order/**")
                         .hasRole("CUSTOMER")
+
                         .requestMatchers("/payment/my")
                         .hasRole("CUSTOMER")
 
-                        .requestMatchers(HttpMethod.GET,
-                                "/review/**")
+                        .requestMatchers(HttpMethod.GET, "/review/**")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.POST,
-                                "/review/**")
+                        .requestMatchers(HttpMethod.POST, "/review/**")
                         .hasRole("CUSTOMER")
 
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/review/**")
+                        .requestMatchers(HttpMethod.DELETE, "/review/**")
                         .hasRole("CUSTOMER")
 
                         .requestMatchers("/inventory/**")
@@ -123,21 +166,24 @@ public class SecurityConfig {
                                 "/payment/revenue"
                         )
                         .hasRole("OWNER")
-                        .requestMatchers(HttpMethod.GET,
+
+                        .requestMatchers(
+                                HttpMethod.GET,
                                 "/orders/revenue",
                                 "/orders/count",
                                 "/orders/recent",
-                                "/orders/today")
+                                "/orders/today"
+                        )
                         .hasAnyRole("OWNER", "ADMIN")
-
-
 
                         .anyRequest()
                         .authenticated()
                 )
 
-                .addFilterBefore(jwtFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
