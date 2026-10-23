@@ -34,7 +34,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(
-                List.of("https://rk-traders-two.vercel.app")
+                List.of("https://rk-traders-furniture.vercel.app")
         );
 
         config.setAllowedMethods(
